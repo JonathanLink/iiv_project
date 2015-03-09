@@ -1,40 +1,36 @@
 public class Plate extends RenderObject  {
   
+  final private float LIMIT_ANGLE = PI / 6.0;
+    
   float w;
   float h;
   float d;
   
-  float angleX = 0;
-  float angleY = 0; 
-  float angleZ = 0; 
   int alpha = 1;
   
   
-  Plate(float w, float h, float d) {
+  Plate(Game game, float w, float h, float d) {
+    super(game);
     this.w = w;
     this.h = h;
     this.d = d; 
   }
   
-  void render() {
-    pushMatrix();
-    rotateX(radians(-this.angleX));
-    rotateY(radians(this.angleY));
-    rotateZ(radians(this.angleZ));
+  void renderObject() {
     stroke(0.0, 0.0, 0.0);
+    fill(255.0, 255.0, 255.0);
     box(this.w, this.h , this.d);
-    popMatrix();  
   }
   
   void keyPressed() {
     if (key == CODED) {
       switch(keyCode) {
         case LEFT:
-          angleY += -alpha*3;  
+          super.angleY += -alpha*3;  
           break;
           
         case RIGHT:
-          angleY += alpha*3; 
+          super.angleY += alpha*3; 
           break; 
        }
     }
@@ -49,30 +45,26 @@ public class Plate extends RenderObject  {
   float angleZ_updated = rotateZpercent*30;
   float angleX_updated = rotateXpercent*30;
   //println("angleZ_updated " + angleZ_updated + " angleX_udpated " + angleX_updated);
-
- //define the four cadrants
+  
+   //define the four cadrants
    if (x>0 && y>0) {
-       angleX = angleX_updated;
-       angleZ = angleZ_updated;
+     super.angleX = angleX_updated;
+     super.angleZ = angleZ_updated;
    } else if (x<0 && y>0) {
-      angleX = angleX_updated;
-      angleZ = -angleZ_updated;  
+     super.angleX = angleX_updated;
+     super.angleZ = -angleZ_updated;  
    } else if (x<0 && y<0) {
-     angleX = -angleX_updated;
-     angleZ = -angleZ_updated; 
+     super.angleX = -angleX_updated;
+     super.angleZ = -angleZ_updated; 
    } else if (x>0 && y<0) {
-     angleX = -angleX_updated;
-     angleZ = angleZ_updated;
+     super.angleX = -angleX_updated;
+     super.angleZ = angleZ_updated;
    }
+   
+   super.angleY = angleY * -1;
 }
   
-  void mouseWheel(MouseEvent event) {
-    //getCount is a number between -10 and 10
-    //if it is positive, we want the angle to increase
-    //if it is negative, we want the angle to decrease
-    println("alpha " + alpha + "/ getCount() " + event.getCount());
-    alpha = abs(event.getCount());
-  }
+
 
   
   

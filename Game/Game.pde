@@ -5,26 +5,29 @@ Authors: Céline Dupuis, Romain Gallay, Jonathan Link
 Date: 2015 - spring semester
 */
 
-final int WINDOW_WIDTH = 500;
-final int WINDOW_HEIGHT = 500;
+
+final boolean DEBUG_MODE = false;
 final int FRAME_RATE = 60;
 
 Plate plate;
 
 void setup() {
-  size(WINDOW_WIDTH, WINDOW_HEIGHT, P3D); 
+  int windowWidth = (DEBUG_MODE)? 500 : displayWidth;
+  int windowHeight = (DEBUG_MODE)? 500 : displayHeight;
+  size(windowWidth, windowHeight, P3D);
   noStroke();
   frameRate(FRAME_RATE);
   initPlate();
 }
 
 void setCamera() {
-  /*
-  camera( width/2, height/2, 500,
+   if (DEBUG_MODE) {
+    camera(); 
+   } else {
+       camera( width/2, height/2, 2000,
           width/2,  height/2, 0,
           0, 1, 0);
-  */
- camera(); 
+   }
 }
 
 void setLight() {
@@ -33,7 +36,7 @@ void setLight() {
 }
 
 void setBackground() {
-  background(200); 
+  background(255.0, 255.0, 255.0); 
 }
 
 void setOrigin(float x, float y, float z) {
@@ -41,7 +44,7 @@ void setOrigin(float x, float y, float z) {
 }
 
 void initPlate() {
-  this.plate = new Plate(width/2, 10, width/2); 
+  this.plate = new Plate(this, width/2, 20, width/2); 
 }
 
 void renderPlate() {
@@ -59,14 +62,11 @@ void draw() {
 }
 
 void keyPressed() {
-  plate.keyPressed();
+  this.plate.keyPressed();
 }
  
+
 void mouseDragged(MouseEvent event) {
-  plate.mouseDragged(event);
+  this.plate.mouseDragged(event);
 }
 
-void mouseWheel(MouseEvent event) {
-  plate.mouseWheel(event);
-}
- 

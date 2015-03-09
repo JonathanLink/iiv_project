@@ -1,14 +1,12 @@
 abstract class RenderObject {
   
-  protected Game game;
   
-  RenderObject(Game game) {
-    this.game = game; 
+  RenderObject() {
   }
   
   abstract void render();
   
   void keyPressed() {};
   void mouseDragged() {}; 
-  // mouseWheel()...
+  void mouseWheel() {};
 }

@@ -41,7 +41,7 @@ void setOrigin(float x, float y, float z) {
 }
 
 void initPlate() {
-  this.plate = new Plate(this, width/2, 10, width/2); 
+  this.plate = new Plate(width/2, 10, width/2); 
 }
 
 void renderPlate() {
@@ -59,10 +59,14 @@ void draw() {
 }
 
 void keyPressed() {
-  this.plate.keyPressed();
+  plate.keyPressed();
 }
  
-void mouseDragged() {
-  this.plate.mouseDragged();
+void mouseDragged(MouseEvent event) {
+  plate.mouseDragged(event);
+}
+
+void mouseWheel(MouseEvent event) {
+  plate.mouseWheel(event);
 }
  

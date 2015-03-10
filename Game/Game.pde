@@ -5,25 +5,29 @@ Authors: Céline Dupuis, Romain Gallay, Jonathan Link
 Date: 2015 - spring semester
 */
 
+
 final boolean DEBUG_MODE = true;
 final int FRAME_RATE = 60;
 
 Plate plate;
 
 void setup() {
-  size(displayWidth, displayHeight, P3D); 
+  int windowWidth = (DEBUG_MODE)? 500 : displayWidth;
+  int windowHeight = (DEBUG_MODE)? 500 : displayHeight;
+  size(windowWidth, windowHeight, P3D);
   noStroke();
   frameRate(FRAME_RATE);
   initPlate();
 }
 
 void setCamera() {
-  
-  camera( width/2, height/2, 4000,
+   if (DEBUG_MODE) {
+    camera(); 
+   } else {
+       camera( width/2, height/2, 2000,
           width/2,  height/2, 0,
           0, 1, 0);
-    
-   //camera(); 
+   }
 }
 
 void setLight() {
@@ -40,7 +44,7 @@ void setOrigin(float x, float y, float z) {
 }
 
 void initPlate() {
-  this.plate = new Plate(this, width/2, 40, width/2); 
+  this.plate = new Plate(width/2, 20, width/2); 
 }
 
 void renderPlate() {
@@ -61,7 +65,12 @@ void keyPressed() {
   this.plate.keyPressed();
 }
  
+
 void mouseDragged() {
   this.plate.mouseDragged();
+}
+
+void mouseWheel(MouseEvent event) {
+   this.plate.mouseWheel(event);
 }
 

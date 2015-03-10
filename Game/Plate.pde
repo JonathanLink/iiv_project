@@ -1,14 +1,17 @@
 public class Plate extends RenderObject {
 
-  final private float SPEED = 5 * PI / 180.0;
-  final private float LIMIT_ANGLE = PI / 3.0;
+  final private float LIMIT_ANGLE = 60.0;
+  final private float SPEED_MIN = 0.5;
+  final private float SPEED_MAX = 1.5;
+  final private float SPEED_STEP = 0.1;
+  
+  float w;
+  float h;
+  float d;
 
-  private float w = 0.0;
-  private float h = 0.0;
-  private float d = 0.0;
+  float speed = 1.0;
 
-  Plate(Game game, float w, float h, float d) {
-    super(game);
+  Plate(float w, float h, float d) {
     this.w = w;
     this.h = h;
     this.d = d;
@@ -16,59 +19,46 @@ public class Plate extends RenderObject {
 
   void renderObject() {
     stroke(0.0, 0.0, 0.0);
-    fill(255, 255, 255);
+    fill(255.0, 255.0, 255.0);
     box(this.w, this.h, this.d);
   }
 
 
-  void keyPressed() {
-    if (game.key == CODED) {
-      switch(game.keyCode) {
-      case LEFT:
-        super.rotateY -= SPEED;
-        break;
-      case RIGHT:
-         super.rotateY += SPEED;
-        break;
-      }
-    }
-  }
-  
-  
-
-  void mouseDragged() {
-
-
-    float mouseYDiff = mouseY - pmouseY;
-    float mouseXDiff = mouseX - pmouseX;
-
-    if ((rotateX + SPEED) < LIMIT_ANGLE) {
-      if (mouseYDiff > 0) {
-        rotateX += SPEED;
-      }
-    } 
-
-    if ((rotateX - SPEED) > -LIMIT_ANGLE) {
-      if (mouseYDiff < 0) {
-        rotateX -= SPEED;
-      }
-    }
- 
-
-    if ((rotateZ + SPEED) < LIMIT_ANGLE) {
-      if (mouseXDiff > 0) {
-        rotateZ += SPEED;
-      }
-    } 
-
-    if ((rotateZ - SPEED) > -LIMIT_ANGLE) {
-      if (mouseXDiff < 0) {
-        rotateZ -= SPEED;
-      }
-    }
+  void mouseDragged() {  
+    float x = (mouseX - pmouseX)*60.0/(width/2.0);
+    float y = (mouseY - pmouseY)*60.0/(height/2.0);    
+    //x = map(x, 0, 60, 0.1, 60);
     
+     
+     if (mouseX <= width && mouseY <= height) {
+       
+      println("x= " + x + " y= " +y);
+         
+       if ((super.angleZ + x * speed) <= LIMIT_ANGLE && (angleZ + x * speed) >= -LIMIT_ANGLE) {
+         super.angleZ += x * speed;
+       }  
+       
+      if ((super.angleX - y * speed ) <= LIMIT_ANGLE && (super.angleX - y * speed) >= -LIMIT_ANGLE) {
+         super.angleX -= y * speed;
+       }
+       
+     }
+     
+  }  
+
+  void mouseWheel(MouseEvent event) {
     
-    
+    float count = event.getCount();
+
+     if (count > 0 && (speed+SPEED_STEP) <= SPEED_MAX) {
+         speed += SPEED_STEP;  
+      } else if (count < 0 && (speed - SPEED_STEP) >= SPEED_MIN) {
+         speed -= SPEED_STEP;
+      }
+      
+      println("speed=" + speed);
+
   }
   
 }
+

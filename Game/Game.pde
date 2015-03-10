@@ -6,7 +6,7 @@ Date: 2015 - spring semester
 */
 
 
-final boolean DEBUG_MODE = false;
+final boolean DEBUG_MODE = true;
 final int FRAME_RATE = 60;
 
 Plate plate;

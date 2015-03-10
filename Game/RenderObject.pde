@@ -45,7 +45,7 @@ abstract class RenderObject {
     strokeWeight(2);
     line(0, 0, 0, width, 0, 0);
     line(0, 0, 0, -width, 0, 0);
-    textSize(50);
+    textSize(20);
     fill(255, 0, 0);
     text("X", width/3, 0, 0); 
 
@@ -54,7 +54,7 @@ abstract class RenderObject {
     strokeWeight(2);
     line(0, width, 0, 0, 0, 0);
     line(0, -width, 0, 0, 0, 0);
-    textSize(50);
+    textSize(20);
     fill(0, 255, 0);
     text("Y", 0, width/3, 0); 
 
@@ -63,7 +63,7 @@ abstract class RenderObject {
     strokeWeight(2);
     line(0, 0, 0, 0, 0, width);
     line(0, 0, 0, 0, 0, -width); 
-    textSize(50);
+    textSize(20);
     fill(0, 0, 255);
     text("Z", 0, 0, width/3);
     

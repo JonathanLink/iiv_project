@@ -61,7 +61,10 @@ public class Plate extends RenderObject  {
      super.angleZ = angleZ_updated;
    }
    
-   super.angleY = angleY * -1;
+   super.angleX = radians(angleX * -1);
+   super.angleY = radians(angleY);
+   super.angleZ = radians(angleZ);
+   
 }
   
 

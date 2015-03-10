@@ -70,8 +70,8 @@ void keyPressed() {
   this.plate.keyPressed();
 }
  
-void mouseDragged(MouseEvent event) {
-  this.plate.mouseDragged(event);
+void mouseDragged() {
+  this.plate.mouseDragged();
 }
 
 void mouseWheel(MouseEvent event) {

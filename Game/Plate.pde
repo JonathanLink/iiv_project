@@ -71,18 +71,18 @@ public class Plate extends RenderObject {
     }
   }
 
-  /*void mouseDragged() {
+  void mouseDragged() {
    float x = mouseX - pmouseX;
    float y = mouseY - pmouseY;
    if ((x>=0 && angleZ <= PI/3) || (x<0 && angleZ >= -PI/3)) {
    angleZ += coeff*x*speed;
    }
    if ((y>=0 && angleX <= PI/3) || (y<0 && angleX >= -PI/3)) {
-   angleX += coeff*y*speed;
+   angleX -= coeff*y*speed;
    }
-   }*/
+   }
 
-  void mouseDragged(MouseEvent event) {
+ /* void mouseDragged(MouseEvent event) {
     float x = event.getX() - width/2;
     float y = event.getY() - height/2;
     float rotateZpercent = abs(x/(width/2));
@@ -104,7 +104,7 @@ public class Plate extends RenderObject {
       angleX = -angleX_updated;
       angleZ = angleZ_updated;
     }
-  }
+  }*/
 
   float getSpeed() {
     return speed;

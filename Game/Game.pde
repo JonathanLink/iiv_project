@@ -27,6 +27,7 @@ void setCamera() {
        camera( width/2, height/2, 2000,
           width/2,  height/2, 0,
           0, 1, 0);
+     //camera(); 
    }
 }
 
@@ -44,7 +45,7 @@ void setOrigin(float x, float y, float z) {
 }
 
 void initPlate() {
-  this.plate = new Plate(width/2, 20, width/2); 
+  this.plate = new Plate(300, 20, 300); 
 }
 
 void renderPlate() {

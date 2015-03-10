@@ -25,8 +25,8 @@ public class Plate extends RenderObject {
 
 
   void mouseDragged() {  
-    float x = (mouseX - pmouseX)*60.0/(width/2.0);
-    float y = (mouseY - pmouseY)*60.0/(height/2.0);    
+    float x = (mouseX - pmouseX) * (60.0 / ((d*1.2)/2.0) );
+    float y = (mouseY - pmouseY) * (60.0 / ((w*1.2)/2.0) );    
     //x = map(x, 0, 60, 0.1, 60);
     
      

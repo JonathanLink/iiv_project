@@ -6,7 +6,7 @@ Date: 2015 - spring semester
 */
 
 
-final boolean DEBUG_MODE = true;
+final boolean DEBUG_MODE = false;
 final int FRAME_RATE = 60;
 
 Plate plate;
@@ -24,10 +24,10 @@ void setCamera() {
    if (DEBUG_MODE) {
     camera(); 
    } else {
-       camera( width/2, height/2, 2000,
+      /* camera( width/2, height/2, 2000,
           width/2,  height/2, 0,
-          0, 1, 0);
-     //camera(); 
+          0, 1, 0);*/
+     camera(); 
    }
 }
 

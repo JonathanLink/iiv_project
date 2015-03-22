@@ -1,40 +1,40 @@
 public class Plate extends RenderObject {
 
-  final private float LIMIT_ANGLE = 60.0; // deg
+  final private float LIMIT_ANGLE = 60.0; //angle in degree
   final private float SPEED_MIN = 0.5;
   final private float SPEED_MAX = 1.5;
-  final private float SPEED_STEP = 0.1;
-
+  final private float SPEED_STEP = 0.05;
+  final private color c;
+   
   float w;
   float h;
   float d;
-
-  private float speed = 1.0;
-  
-  private ArrayList<Obstacle> obstacles;
+  float speed;
 
   Plate(float w, float h, float d) {
     this.w = w;
     this.h = h;
     this.d = d;
-    obstacles = new ArrayList<Obstacle>();
+    speed = 1.0;
+    c = color(192, 192, 192);
+    
   }
   
-  void addObstacle(Obstacle obstacle) {
-    obstacles.add(obstacle);
-  }
-
   void updateObject() {
+    //the plate is updated by user interaction using keyboard and mouse
+     if (DEBUG_MODE) speedOfTilt.updateText("Speed of tilt: " + nf(speed,1,2));
   }
 
   void renderObject() {
-    stroke(0.0, 0.0, 0.0);
+    stroke(140.0, 140.0, 140.0);
     if (angleX > 0.0) {
+      //transparent tilted plate to see the ball
       noFill();
     } else {
-      fill(255.0, 255.0, 255.0);
+      fill(c);
     }
     box(this.w, this.h, this.d);
+    if (DEBUG_MODE) drawAxes(); 
   }
 
 

@@ -1,69 +1,81 @@
 /*
 Project: 3D game made with Processing library
- Course: EPFL - (Introduction to Visual Computing)
- Authors: Céline Dupuis, Romain Gallay, Jonathan Link
- Date: 2015 - spring semester
- */
+Course: EPFL - (Introduction to Visual Computing)
+Authors: Céline Dupuis, Romain Gallay, Jonathan Link
+Date: 2015 - spring semester
+*/
+
+//Variables for the display
+final int FRAME_RATE = 60;
+final boolean DEBUG_MODE = false;
+int windowWidth;
+int windowHeight;
+boolean EDIT_MODE = false;
+Text speedOfTilt;
 
 
-final boolean DEBUG_MODE = true;
-final int FRAME_RATE = 24;
+//Variables for the game
+Ball ball;
+Plate plate;
+final int PLATE_WIDTH = 500;
+final int PLATE_HEIGHT = 40;
+final int PLATE_DEPTH = 500;
+final int BALL_RADIUS = 15;
+final int CYLINDER_RADIUS = 25;
+final int CYLINDER_HEIGHT = 100;
 
 ArrayList <RenderObject> objects; 
-boolean  edit_mode = false;
+ArrayList <Cylinder> obstacles;
 EditModeController editModeController;
 
+
 void setup() {
-  int windowWidth = (DEBUG_MODE)? 500 : displayWidth;
-  int windowHeight = (DEBUG_MODE)? 500 : displayHeight;
+  
+  windowWidth = (DEBUG_MODE)? 900 : displayWidth;
+  windowHeight = (DEBUG_MODE)? 700 : displayHeight;
   size(windowWidth, windowHeight, P3D);
   frameRate(FRAME_RATE);
-
-  float wsf = (DEBUG_MODE)? 1.0 : displayWidth * 0.001; // window size factor (à mettre dans le resize de RenderObject?)
-
+  
   objects = new ArrayList<RenderObject>();
-
-  Background background = new Background(wsf);
-  //addObject(background); // uncomment this line to see an amazing background de ouf.
-
-  Plate plate = new Plate(300 * wsf, 20 * wsf, 300 * wsf ); 
-  addObject(plate); 
-
-  Ball ball = new Ball(plate, 10 * wsf); 
-  addObject(ball);
-
-  Cylinder cylinder = new Cylinder(plate); 
-  addObject(cylinder);
-  plate.addObstacle(cylinder);
-  //cylinder.location.x = 120;
-
+  obstacles = new ArrayList<Cylinder>();
   editModeController = new EditModeController();
 
+  //Initialize the plate and add it to the object array
+  plate = new Plate(PLATE_WIDTH, PLATE_HEIGHT, PLATE_DEPTH); 
+  addObject(plate); 
+  
+  //Initialize the ball add it to the object array
+  ball = new Ball(plate, BALL_RADIUS); 
+  addObject(ball);
+
   if (DEBUG_MODE) {
-    Ball ball2 = new Ball(plate, 10 * wsf, color(0, 255, 0), 4.0); 
+    /*Ball ball2 = new Ball(plate, BALL_RADIUS, color(0, 255, 0), 2.0); 
     addObject(ball2);
 
-    Ball ball3 = new Ball(plate, 20 * wsf, color(0, 0, 255), 8.0); 
-    addObject(ball3);
+    Ball ball3 = new Ball(plate, 2*BALL_RADIUS, color(0, 0, 255), 2.0); 
+    addObject(ball3);*/
 
     Text text = new Text("[DEBUG MODE]"); 
-    text.location.x = -width/2.0;
-    text.location.y = -200;
+    text.location.x = -windowWidth/2.0;
+    text.location.y = -windowHeight/2.0 + 20;
     addObject(text);
-  }
+    
+    speedOfTilt = new Text("Speed of tilt: " + nf(plate.speed,1,2));
+    speedOfTilt.location.x = -windowWidth/2.0;
+    speedOfTilt.location.y =  -windowHeight/2.0 + 50;
+    addObject(speedOfTilt);
+
+  }  
 }
 
 void setCamera() {
-  if (DEBUG_MODE) {
-    camera();
-  } else {
-    camera();
-  }
+   //default camera 
+   camera(windowWidth/2.0, windowHeight/2.0, ((windowHeight/2.0) / tan(PI*30.0 / 180.0)), windowWidth/2.0, windowHeight/2.0, 0, 0, 1, 0);
 }
 
 void setLight() {
   directionalLight(50, 100, 125, 0, -1, 0);
-  ambientLight(102, 102, 102);
+  ambientLight(200, 200, 200);
 }
 
 void setBackground() {
@@ -74,6 +86,25 @@ void setOrigin(float x, float y, float z) {
   translate(x, y, z);
 }
 
+
+void draw() {
+  cursor(ARROW);
+  
+  setCamera();
+  setLight();
+  setBackground();
+  
+  //the origin of the game is at the middle point of the window
+  setOrigin(windowWidth/2, windowHeight/2, 0);
+  
+  if (!EDIT_MODE) { 
+    updateAllObjects();
+    renderAllObjects();
+  } else {
+    editModeController.render();
+  }
+  
+}
 
 void renderAllObjects() {
   for (RenderObject o : objects) {
@@ -91,64 +122,11 @@ void addObject(RenderObject object) {
   objects.add(object);
 }
 
-void draw() {
-  setCamera();
-  setLight();
-  setBackground();
-  setOrigin(width/2, height/2, 0);
-
-  if (!edit_mode) {
-    updateAllObjects();
-    renderAllObjects();
-  } else {
-    editModeController.render();
-  }
+void addObstacle(Cylinder object) {
+  obstacles.add(object);
 }
 
-void keyPressed() {
-  if (key == CODED) {
-    if (keyCode == SHIFT) {
-      edit_mode = true;
-    }
-  }
-
-  for (RenderObject o : objects) {
-    o.keyPressed();
-  }
+PVector coord2Dto3D (int coordX, int coordY) {
+  return new PVector(coordX,0,coordY);
 }
-
-void keyReleased() {
-  if (edit_mode) {
-    if (key == CODED && keyCode == SHIFT) {
-      edit_mode = false;
-    }
-  }
-}
-
-
-void mouseDragged() {
-  if (!edit_mode) {
-    for (RenderObject o : objects) {
-      o.mouseDragged();
-    }
-  }
-}
-
-void mouseWheel(MouseEvent event) {
-  if (!edit_mode) {
-    for (RenderObject o : objects) {
-      o.mouseWheel(event);
-    }
-  }
-}
-
-void mouseClicked() {
-  if (edit_mode) {
-    editModeController.mouseClicked();
-  }
-}
-
-/*boolean sketchFullScreen() {
- return (DEBUG_MODE == false);
- }*/
 

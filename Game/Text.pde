@@ -8,7 +8,6 @@ public class Text extends RenderObject {
   
   void renderObject() {
     pushMatrix();
-    //translate(frameCount % width, 0, 0);
     textSize(20);
     fill(0, 0, 0);
     text(text, 0, 0, 0);
@@ -16,11 +15,15 @@ public class Text extends RenderObject {
   }
 
   void updateObject() {
-   
+     
   }
   
   void drawAxes() {
-    
+   
+  }
+  
+  void updateText(String text) {
+    this.text = text;
   }
   
   String toString() {

@@ -1,27 +1,33 @@
-public class Cylinder extends RenderObject implements Obstacle {
+public class Cylinder extends RenderObject {
 
-  private final int cylinderResolution = 40;
-  private float cylinderBaseSize;
-  private float cylinderHeight;
-  private PShape cylinder;
   private Plate plate;
+  private PShape cylinder;
+  private int cylinderResolution ;
+  private float cylinderBaseSize;
+  private color c;
+  float centerCoordX;
+  float centerCoordZ;
 
-  Cylinder(Plate plate, float cylinderBaseSize) {
+
+  Cylinder(Plate plate, float cylinderBaseSize, float centerCoordX, float centerCoordZ) {
     this.plate = plate;
     this.cylinderBaseSize = cylinderBaseSize;
-    cylinderHeight = 100;
+    this.centerCoordX = centerCoordX;
+    this.centerCoordZ = centerCoordZ;
+    cylinderResolution = 40;
+    c = color(70, 220, 30);
     cylinder = new PShape();
-
     buildCylinder();
+    location.x = centerCoordX;
+    location.z = centerCoordZ;
   }
-  
-  Cylinder(Plate plate) {
-    this(plate, 25);
+
+  Cylinder(Plate plate, float cylinderBaseSize) {
+    this(plate, cylinderBaseSize, 0, 0);
   }
 
   private void buildCylinder() {
     float angle;
-
     float[] x = new float[cylinderResolution + 1];
     float[] z = new float[cylinderResolution + 1];
     for (int i = 0; i < x.length; ++i) {
@@ -29,14 +35,28 @@ public class Cylinder extends RenderObject implements Obstacle {
       x[i] = sin(angle) * cylinderBaseSize;
       z[i] = cos(angle) * cylinderBaseSize;
     }
+    
+    fill(c);
+    
     cylinder = createShape();
-    cylinder.beginShape(QUAD_STRIP); // TRIANGLES or TRIANGLE_FAN or QUAD_STRIP
-    for (int i = 0; i < x.length; ++i) {
-      cylinder.vertex(x[i], round(- plate.h/2.0), z[i] );
-      cylinder.vertex(x[i], -cylinderHeight, z[i] );
+    cylinder.beginShape(TRIANGLE_FAN);
+    for (int i=0; i<x.length; i++) {
+      cylinder.vertex(0, -CYLINDER_HEIGHT, 0);
+      cylinder.vertex(x[i], -CYLINDER_HEIGHT, z[i]);
     }
+    cylinder.beginShape(TRIANGLE_FAN);
+    for (int i=0; i<x.length; i++) {
+      cylinder.vertex(0, -this.plate.h/2, 0);
+      cylinder.vertex(x[i], -this.plate.h/2, z[i] );
+    }
+    cylinder.beginShape(QUAD_STRIP); 
+    for (int i = 0; i < x.length; ++i) {
+      cylinder.vertex(x[i], round(-plate.h/2.0), z[i] );
+      cylinder.vertex(x[i], -CYLINDER_HEIGHT, z[i] );
+    } 
     cylinder.noStroke();
     cylinder.endShape();
+    
   }
 
   void updateObject() {
@@ -45,13 +65,8 @@ public class Cylinder extends RenderObject implements Obstacle {
   }
 
   void renderObject() {
-    pushMatrix();
-    //translate(40*sin(radians(frameCount%360)), 0, 40*cos(radians(frameCount%360)) );
-    //drawAxes();
     shape(cylinder);
-    popMatrix();
   }
-
 
 
   String toString() {

@@ -1,29 +1,29 @@
 abstract class RenderObject {
 
-  public static final float GRAVITY = 0.1; 
+  public static final float GRAVITY_CONST = 0.08; 
+  public static final float FRICTION_COEF = 0.02;
 
   
-  public PVector location;
+  protected PVector location;
   protected PVector velocity;
-  protected PVector acceleration;
   protected PVector gravity;
+  protected PVector acceleration;
+  protected PVector force_normal;
   protected float mass;
+  protected float angleX; 
+  protected float angleY; 
+  protected float angleZ;
   
-  protected float angleX = 0.0;
-  protected float angleY = 0.0;
-  protected float angleZ = 0.0;
-  protected float mouseWheelCount = 0.0;
-  
-  protected float scale;
-  
-  
+
   RenderObject() {
     mass = 1.0;
+    angleX = 0.0;
+    angleY = 0.0;
+    angleZ = 0.0;
     location = new PVector(0, 0, 0);
     velocity = new PVector(0, 0, 0);
     acceleration = new PVector(0, 0, 0);
     gravity = new PVector(0, 0, 0);
-    scale = 1.0;
   }
   
   abstract void renderObject();
@@ -36,37 +36,24 @@ abstract class RenderObject {
     rotateY(radians(angleY));    
     rotateZ(radians(angleZ));  
     translate(location.x, location.y, location.z);
-    scale(scale);
-    if (DEBUG_MODE) drawAxes();
     this.renderObject();
     popMatrix();
   }
-
-  void keyPressed() {
-  };
   
-  void mouseDragged() {
-  }; 
-  
-  void mouseWheel(MouseEvent event) {
-  };
-  
-
-  protected void applyForce(PVector force) {
-    PVector copyForce = PVector.div(force, mass);
-    acceleration.add(copyForce); 
-  }
-  
-  
-  protected void update() {
+    
+  void update() {  
     this.updateObject();
     velocity.add(acceleration);
     location.add(velocity);
     acceleration.mult(0); 
   }
-  
-  
-  protected PVector generateFrictionForce(float mu) {
+
+  void applyForce(PVector force) {
+    PVector copyForce = PVector.div(force, mass);
+    acceleration.add(copyForce); 
+  }
+    
+  PVector generateFrictionForce(float mu) {
       PVector friction = velocity.get();
       friction.mult(-1);
       friction.normalize();
@@ -74,8 +61,14 @@ abstract class RenderObject {
       return friction;
   }
 
-  protected void drawAxes() {
+  void keyPressed() {};
+  
+  void mouseDragged() {}; 
+  
+  void mouseWheel(MouseEvent event) {};
 
+  void drawAxes() {
+  pushMatrix();
     // X axe
     stroke(255, 0, 0);
     strokeWeight(2);
@@ -102,9 +95,8 @@ abstract class RenderObject {
     textSize(20);
     fill(0, 0, 255);
     text("Z", 0, 0, width/3);
-    
+   popMatrix();
   }
-  
-  
+   
 }
 

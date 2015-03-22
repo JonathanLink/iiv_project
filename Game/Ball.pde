@@ -23,7 +23,7 @@ public class Ball extends RenderObject {
     angleZ = plate.angleZ;
 
     checkForEdges();
-    checkForCylinders();
+    checkCylinderCollision();
 
     addFrictionForce();
     addGravity();
@@ -67,7 +67,7 @@ public class Ball extends RenderObject {
   }
 
 
-  private void checkForCylinders() {
+  private void checkCylinderCollision() {
 
     if(!obstacles.isEmpty()) {
       PVector distanceBetweenCenters;

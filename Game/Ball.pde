@@ -25,8 +25,9 @@ public class Ball extends RenderObject {
     checkForEdges();
     checkCylinderCollision();
 
-    addFrictionForce();
     addGravity();
+    addFrictionForce();
+    
   }
 
   private void addGravity() {
@@ -69,38 +70,47 @@ public class Ball extends RenderObject {
 
   private void checkCylinderCollision() {
 
-    if(!obstacles.isEmpty()) {
+    if (!obstacles.isEmpty()) {
       PVector distanceBetweenCenters;
-      
+
+      PVector totalNormal = new PVector(0, 0, 0);
       for (Cylinder o : obstacles) {
-        
-        distanceBetweenCenters = PVector.sub(this.location,o.location);    
+
+        distanceBetweenCenters = PVector.sub(this.location, o.location);    
         distanceBetweenCenters.y = 0;
-        
+
         //test for collisions
         if (distanceBetweenCenters.mag() < BALL_RADIUS+CYLINDER_RADIUS ) {
 
+          //normalize the vector given by the two centers at the time of the collision
           distanceBetweenCenters.normalize();
+          //create the normal vector
           PVector normal = distanceBetweenCenters.get();
+          //compute the cos angle between velocity and normal
           float cos = normal.dot(velocity)/(normal.mag()*velocity.mag());
 
-          //if velocity heads to the cylinder
+          //test if the velocity heads to the cylinder and update the velocity
           if (cos < 0) {
-            PVector temp = normal.get();
-            float angle = 2*velocity.dot(temp);
-            temp.mult(angle);
-            velocity.sub(temp);
-            velocity.mult(0.6);
+            float angle = 2*normal.dot(velocity);
+            PVector temp = PVector.mult(normal, angle);
+            //computation of the new velocity
+            velocity = PVector.sub(velocity, temp);
+            //lost of energy after hitting the cylinder
+            velocity = PVector.mult(velocity, 0.5);
+            
           }
-          
-          //apply the normal force
-          normal.setMag(gravity.mag());
-          applyForce(normal);
-          
-          //exit the loop if there is a collision
-          break;
-         }
-       }
+
+          // add normal force of the current obstacle
+          totalNormal.add(normal);
+
+        }
+      }
+
+      //apply the normal force
+      if (totalNormal.mag() > 0) {
+        totalNormal.setMag(gravity.mag());
+        applyForce(totalNormal);
+      }
     }
   }
 

@@ -21,30 +21,37 @@ public class PlateEdges extends PlateObstacleObject {
 			ball.location.x = (float) (plate.width/2.0 - ball.radius);
 			ball.velocity.x *= -0.5;
 			normal.x = ball.velocity.x;
+		    plateController.addPoints(PApplet.ceil(-plateController.ball.velocity.mag()));
 		} else if (ball.location.x < -plate.width/2.0 + ball.radius) {
 			ball.location.x = (float) (-plate.width/2.0 + ball.radius);
 			ball.velocity.x *= -0.5;
 			normal.x = ball.velocity.x;
+		    plateController.addPoints(PApplet.ceil(-plateController.ball.velocity.mag()));
 		}
 
 		if (ball.location.z  > plate.depth/2.0 - ball.radius) {
 			ball.location.z = (float) (plate.depth/2.0 - ball.radius);
 			ball.velocity.z *= -0.5;
 			normal.z = ball.velocity.z;
+		    plateController.addPoints(PApplet.ceil(-plateController.ball.velocity.mag()));
 		} else if (ball.location.z < -plate.depth/2.0 + ball.radius) {
 			ball.location.z = (float) (-plate.depth/2.0 + ball.radius);
 			ball.velocity.z *= -0.5;
 			normal.z = ball.velocity.z;
+		    plateController.addPoints(PApplet.ceil(-plateController.ball.velocity.mag()));
 		}
 
 		return normal;
 	}
 
 	public void draw2D(PGraphics pGraphics) {
-		//stroke(color(255,0,0));
-		//rect(0, 0, plate.width, plate.height);
+
 	}
 
 	protected void renderObject() {
+	}
+	
+	public boolean isCylindric() {
+		return false;
 	}
 }

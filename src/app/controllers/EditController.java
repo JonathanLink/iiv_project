@@ -52,7 +52,6 @@ class EditController extends Controller {
 		//test if the mouse click is on the plate
 		if (isMouseInsidePlate()) {
 			PVector mouseLocation = new PVector(getCoordX(), 0, getCoordY());
-
 			//Prevent to add an obstacle on the ball
 			if (!isBallClear(mouseLocation)) return;
 			//Prevent to add an obstacle which could overlapp another obstacle
@@ -83,7 +82,7 @@ class EditController extends Controller {
 	private boolean isBallClear(PVector mouseLocation) {
 		PVector distanceToTheBall = PVector.sub(mouseLocation, ball.location); 
 		distanceToTheBall.y = 0; 
-		if (distanceToTheBall.mag() < Cylinder.CYLINDER_RADIUS + ball.radius) { // TODO: optimiser, on aura pas forcément que des formes cylindres (rectangle par ex.)
+		if (distanceToTheBall.mag() < Cylinder.CYLINDER_RADIUS + ball.radius) { // TODO: optimiser, on aura pas forcement que des formes cylindres (rectangle par ex.)
 			MainController.consoleLayer.write("ERROR: you cannot add a cylinder here,it would overlap with the ball");
 			return false;
 		}
@@ -93,20 +92,20 @@ class EditController extends Controller {
 	private boolean isObstacleClear(PVector mouseLocation) {
 		for (PlateObstacleObject obstacle : plateController.obstacleList) {
 			PVector distanceBetweenCylinders = PVector.sub(mouseLocation, obstacle.location);      
-			if (distanceBetweenCylinders.mag() < 2.0*Cylinder.CYLINDER_RADIUS ) {
-				MainController.consoleLayer.write("ERROR: you cannot add a cylinder here,it would overlap another cylinder");
+			if (obstacle.isCylindric() && distanceBetweenCylinders.mag() < 2.0*Cylinder.CYLINDER_RADIUS ) {
 				return false;
 			}
 		}
 		return true;
 	}
-
+	
 	//methods that return the mouse click in the game coordinates, i.e with the origin in the middle of the window
-	private int getCoordX() {
+	public int getCoordX() {
 		return PApplet.round(p.mouseX - p.displayWidth/2.0f);
 	}
 
-	private int getCoordY() {
+	public int getCoordY() {
 		return PApplet.round(p.mouseY - p.displayHeight/2.0f);
 	}
+
 }

@@ -6,9 +6,9 @@ import processing.event.MouseEvent;
 
 
 public class MainController extends PApplet {
-	
+
 	public final static int FRAME_RATE = 30;
-	public final static boolean DEBUG_MODE = true;
+	public final static boolean DEBUG_MODE = false;
 	public final static int PLATE_MODE = 0;
 	public final static int EDIT_MODE = 1;
 	
@@ -19,8 +19,10 @@ public class MainController extends PApplet {
 	private PlateController plateController;
 	private EditController editController;
 	private Controller currentController;
+	
 	// Layers
 	private DataVisualizationLayer dataVisualizationLayer;
+	
 	// SerialVersionUID (to please to Eclipse...)
 	private static final long serialVersionUID = 1L;
 
@@ -46,6 +48,7 @@ public class MainController extends PApplet {
 
 		// Set console
 		consoleLayer = new ConsoleLayer(this);
+		
 	}
 	
 	public void draw() {
@@ -53,12 +56,12 @@ public class MainController extends PApplet {
 
 		setCamera();
 		setLight();
-		setBackground();
+		setBackground();	
 
-		currentController.draw();
-		if (DEBUG_MODE) consoleLayer.draw();
+		//Do not change the order of the draw functions : first the window displays (layers), second the game display (plate,ball)
 		dataVisualizationLayer.draw();
-
+		if (DEBUG_MODE) consoleLayer.draw();
+		currentController.draw();	
 	}
 	
 	public void keyPressed() {
@@ -93,8 +96,7 @@ public class MainController extends PApplet {
 	}
 
 	private void setLight() {
-		directionalLight(50, 100, 125, 0, -1, 0);
-		ambientLight(200, 200, 200);
+		//TODO set the light correctly
 	}
 
 	private void setBackground() {

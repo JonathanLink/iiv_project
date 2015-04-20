@@ -40,5 +40,8 @@ public class MovingCylinder extends Cylinder {
 		leftToRight = true;
 	}
 
+	public boolean isCylindric() {
+		return true;
+	}
 
 }

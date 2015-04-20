@@ -13,4 +13,6 @@ public abstract class PlateObstacleObject extends PlateObject {
 	}
 
 	public abstract PVector checkForCollisionWithBall(Ball ball);
+	
+	public abstract boolean isCylindric();
 }

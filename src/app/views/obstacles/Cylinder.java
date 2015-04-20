@@ -21,7 +21,7 @@ public class Cylinder extends PlateObstacleObject {
 	private int collisionColor;
 	private static final int CYLINDER_RESOLUTION = 40;
 	private static final float MIN_VELOCITY_COLLISION = 0.55f;
-
+	
 
 	public Cylinder(PApplet parent, PlateController plateController, float radius, float centerCoordX, float centerCoordZ, int fillColor) {
 		super(parent, plateController);
@@ -49,6 +49,8 @@ public class Cylinder extends PlateObstacleObject {
 
 		//test for collisions
 		if (distanceBetweenCenters.mag() < ball.radius + radius ) {
+			
+			plateController.addPoints(PApplet.round(ball.velocity.mag()));
 
 			// user win some points proportioned to the velocity of the ball
 			if (ball.velocity.mag() >= MIN_VELOCITY_COLLISION) {
@@ -56,7 +58,7 @@ public class Cylinder extends PlateObstacleObject {
 					previousColor = fillColor;
 					fillColor = collisionColor;
 				}
-				addPoints(ball.velocity);
+				addPointsText(ball.velocity.mag());
 			}
 
 			//normalize the vector given by the two centers at the time of the collision
@@ -76,6 +78,7 @@ public class Cylinder extends PlateObstacleObject {
 				ball.velocity = PVector.mult(ball.velocity, 0.5f);
 			}
 			return normal;
+			
 		} else {
 			this.fillColor = previousColor;
 			return new PVector(0, 0, 0);
@@ -140,11 +143,14 @@ public class Cylinder extends PlateObstacleObject {
 	}
 
 
-	private void addPoints(PVector velocity) {
-		String text = "+"+ PApplet.round(velocity.mag())+" PTS!";
+	private void addPointsText(float velocity) {
+		String text = "+"+ PApplet.round(velocity)+" PTS!";
 		PointsText pointsText = new PointsText(p, plateController, text, location.x, location.y - CYLINDER_HEIGHT, location.z);
 		plateController.addAnimatedTextPlate(pointsText);
-		MainController.consoleLayer.write("ball velocity:"+velocity.mag());
+	}
+	
+	public boolean isCylindric() {
+		return true;
 	}
 
 

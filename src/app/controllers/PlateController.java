@@ -17,6 +17,10 @@ public class PlateController extends Controller {
 	public Plate plate;
 	public Ball ball;
 	public ArrayList<PlateObstacleObject> obstacleList;
+	public float totalScore;
+	public float gainPoints;
+	public boolean locked;
+
 	
 	private static final  float GRAVITY_CONST = 0.05f; 
 	private static final float LIMIT_ANGLE = 60.0f; //angle in degree
@@ -36,6 +40,7 @@ public class PlateController extends Controller {
 		// add plate edges (4 walls)
 		PlateEdges plateEdges = new PlateEdges(parent, this);
 		this.addPlateObstacle(plateEdges);
+		totalScore = 0f;
 	}
 
 	public void addPlateObstacle(PlateObstacleObject obstacle) {
@@ -44,6 +49,11 @@ public class PlateController extends Controller {
 
 	public void addAnimatedTextPlate(AnimatedTextPlate animatedTextPlate) {
 		animatedTextList.add(animatedTextPlate);
+	}
+	
+	public void addPoints(float gainPoints) {
+		this.gainPoints = gainPoints;
+		totalScore += gainPoints;
 	}
 
 	public void draw() {
@@ -64,7 +74,7 @@ public class PlateController extends Controller {
 	public void mouseDragged() {  
 		float x = (float) ((p.mouseX - p.pmouseX) * (LIMIT_ANGLE / ((plate.depth * 1.2) / 2.0) ));
 		float y = (float) ((p.mouseY - p.pmouseY) * (LIMIT_ANGLE / ((plate.width * 1.2) / 2.0) ));
-		if (p.mouseX <= p.width && p.mouseY <= p.height) {
+		if (p.mouseX <= p.width && p.mouseY <= p.height && !locked) {
 			if ((plate.angleZ + x * plate.speed) <= LIMIT_ANGLE && (plate.angleZ + x * plate.speed) >= -LIMIT_ANGLE) {
 				plate.angleZ += x * plate.speed;
 			} 
@@ -118,5 +128,15 @@ public class PlateController extends Controller {
 		plateObject.gravity.z = -PApplet.sin(PApplet.radians(plate.angleX)) * GRAVITY_CONST;
 		plateObject.applyForce(plateObject.gravity);
 	}
+	
+	//methods that return the mouse click in the game coordinates, i.e with the origin in the middle of the window
+	public int getCoordX() {
+		return PApplet.round(p.mouseX - p.displayWidth/2.0f);
+	}
+
+	public int getCoordY() {
+		return PApplet.round(p.mouseY - p.displayHeight/2.0f);
+	}
+	
 
 }

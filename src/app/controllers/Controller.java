@@ -29,4 +29,6 @@ abstract class Controller extends Parent {
 	public void setOrigin(float x, float y, float z) {
 		p.translate(x, y, z);
 	}
+	
+
 }

@@ -7,9 +7,9 @@ import processing.core.PGraphics;
 
 public class Plate extends RenderObject {
 
-	static final int PLATE_WIDTH = 500;
+	static final int PLATE_WIDTH = 400;
 	static final int PLATE_HEIGHT = 40;
-	static final int PLATE_DEPTH = 500;
+	static final int PLATE_DEPTH = 400;
 
 	public int fillColor;
 	public float width;
@@ -47,7 +47,7 @@ public class Plate extends RenderObject {
 	}
 
 	public void draw2D(PGraphics pGraphics) {
-		pGraphics.stroke(fillColor);
+		pGraphics.noStroke();
 		pGraphics.fill(fillColor);
 		pGraphics.rect(0, 0, this.width, this.depth);
 	}

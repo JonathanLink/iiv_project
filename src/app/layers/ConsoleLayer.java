@@ -9,7 +9,7 @@ public class ConsoleLayer extends Layer {
 	private ArrayList<String> logs;
 
 	public ConsoleLayer(PApplet parent) {
-		super(parent, parent.displayWidth, 150);
+		super(parent, parent.displayWidth, 105,0,0);
 		logs = new ArrayList<String>();
 	}
 
@@ -24,6 +24,7 @@ public class ConsoleLayer extends Layer {
 		p.fill(255, 255, 255);
 		p.textSize(15);
 		int y = 10;
+		//TODO console the other way around
 		for (int i = logs.size() - 1; i >= 0; i--) {
 			String log = logs.get(i); 
 			layer.text(log, 0, y, 0);
@@ -31,14 +32,4 @@ public class ConsoleLayer extends Layer {
 		}
 		layer.endDraw();
 	}
-
-	protected int getX() {
-		return 0;
-	}
-
-	protected int getY() {
-		return 0;
-	}
-
-
 }

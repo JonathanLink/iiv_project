@@ -72,7 +72,6 @@ public abstract class RenderObject extends Parent {
 	protected abstract void updateObject();
 	
 	protected void drawAxes() {
-		p.pushMatrix();
 		// X axe
 		p.stroke(255, 0, 0);
 		p.strokeWeight(2);
@@ -89,17 +88,18 @@ public abstract class RenderObject extends Parent {
 		p.line(0, -p.width, 0, 0, 0, 0);
 		p.textSize(20);
 		p.fill(0, 255, 0);
-		p.text("Y", 0, p.width/3, 0); 
+		p.text("Y", 0, -p.height/3, 0); 
 
 		// Z axe
 		p.stroke(0, 0, 255);
 		p.strokeWeight(2);
 		p.line(0, 0, 0, 0, 0, p.width);
 		p.line(0, 0, 0, 0, 0, -p.width); 
-		p.textSize(20);
+		p.textSize(10);
 		p.fill(0, 0, 255);
 		p.text("Z", 0, 0, p.width/3);
-		p.popMatrix();
+		
+		p.strokeWeight(1);
 	}
 
 	private PVector applyZeroThreshold(PVector v) {

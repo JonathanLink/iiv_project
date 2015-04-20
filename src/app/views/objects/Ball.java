@@ -8,7 +8,7 @@ import processing.core.PVector;
 
 public class Ball extends PlateObject {
 
-	static final float BALL_RADIUS = 15.0f;
+	public static final float BALL_RADIUS = 15.0f;
 
 
 	public int fillColor;

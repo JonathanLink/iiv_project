@@ -8,7 +8,7 @@ import processing.event.MouseEvent;
 public class MainController extends PApplet {
 
 	public final static int FRAME_RATE = 30;
-	public final static boolean DEBUG_MODE = false;
+	public final static boolean DEBUG_MODE = true;
 	public final static int PLATE_MODE = 0;
 	public final static int EDIT_MODE = 1;
 	

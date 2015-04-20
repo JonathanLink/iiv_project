@@ -2,7 +2,6 @@ package app.layers;
 
 import processing.core.PApplet;
 import processing.core.PGraphics;
-import app.controllers.MainController;
 import app.controllers.PlateController;
 import app.views.objects.Ball;
 import app.views.obstacles.PlateObstacleObject;
@@ -99,9 +98,9 @@ public class DataVisualizationLayer extends Layer{
 		//Text of the scoreboard
 		scoreBoard.fill(0);  
 		scoreBoard.textSize(12);
-		scoreBoard.text("× Total Score", 15, 20);
-		scoreBoard.text("× Velocity", 15, 80);
-		scoreBoard.text("× Last Score", 15, 120);
+		scoreBoard.text("ï¿½ Total Score", 15, 20);
+		scoreBoard.text("ï¿½ Velocity", 15, 80);
+		scoreBoard.text("ï¿½ Last Score", 15, 120);
 		//TODO what does last score represent?
 		//scoreBoard.text("-- pts", 15, 135);
 

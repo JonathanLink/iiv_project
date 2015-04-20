@@ -1,7 +1,6 @@
 package app.layers;
 
 import app.Parent;
-import app.controllers.MainController;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 

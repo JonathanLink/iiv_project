@@ -22,7 +22,7 @@ public class PlateController extends Controller {
 	public boolean locked;
 
 	
-	private static final  float GRAVITY_CONST = 0.05f; 
+	private static final  float GRAVITY_CONST = 0.1f;  // 0.05 initially
 	private static final float LIMIT_ANGLE = 60.0f; //angle in degree
 	private static final float SPEED_MIN = 0.5f;
 	private static final float SPEED_MAX = 1.5f;
@@ -127,6 +127,22 @@ public class PlateController extends Controller {
 		plateObject.gravity.x = PApplet.sin(PApplet.radians(plate.angleZ)) * GRAVITY_CONST;
 		plateObject.gravity.z = -PApplet.sin(PApplet.radians(plate.angleX)) * GRAVITY_CONST;
 		plateObject.applyForce(plateObject.gravity);
+	}
+	
+	private void freezeBall() {
+		ball.acceleration = new PVector(0,0,0);
+		ball.velocity = new PVector(0,0,0);
+		plate.angleX = 0.0f;
+		plate.angleZ = 0.0f;
+	}
+	
+	public void keyPressed() {
+		if(MainController.DEBUG_MODE) {
+			final int LETTER_S = 83;
+			if (p.keyCode == LETTER_S) {
+				freezeBall();
+			} 
+		}
 	}
 	
 	//methods that return the mouse click in the game coordinates, i.e with the origin in the middle of the window

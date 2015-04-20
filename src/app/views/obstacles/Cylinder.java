@@ -17,10 +17,10 @@ public class Cylinder extends PlateObstacleObject {
 	protected float radius;
 	protected int fillColor;
 
-	private int previousColor;
-	private int collisionColor;
-	private static final int CYLINDER_RESOLUTION = 40;
-	private static final float MIN_VELOCITY_COLLISION = 0.55f;
+	protected int previousColor;
+	protected int collisionColor;
+	protected static final int CYLINDER_RESOLUTION = 40;
+	protected static final float MIN_VELOCITY_COLLISION = 1.0f;
 	
 
 	public Cylinder(PApplet parent, PlateController plateController, float radius, float centerCoordX, float centerCoordZ, int fillColor) {
@@ -66,11 +66,11 @@ public class Cylinder extends PlateObstacleObject {
 			//create the normal vector
 			PVector normal = distanceBetweenCenters.get();
 			//compute the cos angle between velocity and normal
-			float cos = normal.dot(ball.velocity)/(normal.mag()*ball.velocity.mag());
+			float cos = normal.dot(ball.velocity) / (normal.mag() * ball.velocity.mag() );
 
 			//test if the velocity heads to the cylinder and update the velocity
 			if (cos < 0) {
-				float angle = 2*normal.dot(ball.velocity);
+				float angle = 2 * normal.dot(ball.velocity);
 				PVector temp = PVector.mult(normal, angle);
 				//computation of the new velocity
 				ball.velocity = PVector.sub(ball.velocity, temp);
@@ -89,6 +89,10 @@ public class Cylinder extends PlateObstacleObject {
 		pGraphics.stroke(fillColor);
 		pGraphics.fill(fillColor);
 		pGraphics.ellipse(location.x, location.z, 2*radius, 2*radius);
+	}
+	
+	public boolean isCylindric() {
+		return true;
 	}
 
 	public String toString() {
@@ -143,15 +147,13 @@ public class Cylinder extends PlateObstacleObject {
 	}
 
 
-	private void addPointsText(float velocity) {
+	protected void addPointsText(float velocity) {
 		String text = "+"+ PApplet.round(velocity)+" PTS!";
 		PointsText pointsText = new PointsText(p, plateController, text, location.x, location.y - CYLINDER_HEIGHT, location.z);
 		plateController.addAnimatedTextPlate(pointsText);
 	}
 	
-	public boolean isCylindric() {
-		return true;
-	}
+	
 
 
 }

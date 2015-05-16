@@ -1,0 +1,22 @@
+# Blender MTL File: 'untitled.blend'
+# Material Count: 2
+
+newmtl Feuillage
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.114841 0.640000 0.027091
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd Feuillage Diffuse Color.png
+
+newmtl Tronc
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.215926 0.153302
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd .

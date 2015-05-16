@@ -11,7 +11,7 @@ public class ImageProcessing extends PApplet{
 	
 	public static final String BOARD_IMAGE= "board1.jpg"; // <--- HERE to change the image file
 	
-	PImage img, img2, img3, img4; //orignal images
+	PImage img;
 	PImage imageEdges;
 	PImage currentImg;
 	float scale = 0.5f;
@@ -62,9 +62,6 @@ public class ImageProcessing extends PApplet{
 
 	  //load the original images
 	  img = loadImage(BOARD_IMAGE); 
-	  /*img2 = loadImage("board2.jpg");
-	  img3 = loadImage("board3.jpg");
-	  img4 = loadImage("board4.jpg");*/
 
 	  size(ceil(img.width*3*scale), ceil(img.height*scale));
 

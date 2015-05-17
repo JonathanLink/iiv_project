@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class ImageProcessing extends PApplet{
 	
-	public static final String BOARD_IMAGE= "board1.jpg"; // <--- HERE to change the image file
+	public static final String BOARD_IMAGE= "board1.jpg"; // <---- HERE to change the image file
 	
 	PImage img;
 	PImage imageEdges;

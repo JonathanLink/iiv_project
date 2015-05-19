@@ -8,7 +8,7 @@ import app.views.obstacles.PlateObstacleObject;
 
 public class DataVisualizationLayer extends Layer{
 
-	private static final float TOP_VIEW_SCALE = 0.4f;
+	private static final float TOP_VIEW_SCALE = 0.28f;
 	private static final int MARGIN_BTW_COMPONENT = 20;
 	private static final int Y_ALIGN = 10;
 	private static final int COMPONENT_HEIGHT = 160;
@@ -47,6 +47,29 @@ public class DataVisualizationLayer extends Layer{
 		chart = new int [(barChart.width/4)]; //4 is the minimum width of the tiny rectangles
 	}
 
+	public boolean isMouseOverSlider() {
+		int xPosition= topView.width + scoreBoard.width + 3*MARGIN_BTW_COMPONENT - this.getX();
+		int yPosition =Y_ALIGN + barChart.height + 10 + this.getY();
+		return (p.mouseX > xPosition && p.mouseX < xPosition+scrollbar.width &&
+				p.mouseY > yPosition -10);
+	}
+
+	//Return the clicked value in the scrollbar coordinates, i.e zero is on the left of the component
+	public int getCoordXScrollbar() {
+		return p.mouseX - (topView.width + scoreBoard.width + 3*MARGIN_BTW_COMPONENT - this.getX());
+	}
+
+
+	//The slider position in the interval [0,1]
+	public float getSliderPos() {
+		return (sliderPosition)/(scrollbar.width - scrollbar.height);
+	}
+
+	//Clamps the value into the interval
+	float constrain(float val, float minVal, float maxVal) { 
+		return PApplet.min(PApplet.max(val, minVal), maxVal);
+	}
+	
 	protected void drawMyLayer() {
 
 		drawTopView();
@@ -203,32 +226,7 @@ public class DataVisualizationLayer extends Layer{
 		scrollbar.endDraw();
 	}
 
-	public boolean isMouseOverSlider() {
-		int xPosition= topView.width + scoreBoard.width + 3*MARGIN_BTW_COMPONENT - this.getX();
-		int yPosition =Y_ALIGN + barChart.height + 10 + this.getY();
-		if (p.mouseX > xPosition && p.mouseX < xPosition+scrollbar.width &&
-				p.mouseY > yPosition -10) {
-			return true; 
-		} else {
-			return false;
-		} 
-	}
 
-	//Return the clicked value in the scrollbar coordinates, i.e zero is on the left of the component
-	public int getCoordXScrollbar() {
-		return p.mouseX - (topView.width + scoreBoard.width + 3*MARGIN_BTW_COMPONENT - this.getX());
-	}
-
-
-	//The slider position in the interval [0,1]
-	public float getSliderPos() {
-		return (sliderPosition)/(scrollbar.width - scrollbar.height);
-	}
-
-	//Clamps the value into the interval
-	float constrain(float val, float minVal, float maxVal) { 
-		return PApplet.min(PApplet.max(val, minVal), maxVal);
-	}
 
 
 }

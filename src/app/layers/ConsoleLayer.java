@@ -19,6 +19,7 @@ public class ConsoleLayer extends Layer {
 	}
 
 	protected void drawMyLayer() {
+		
 		layer.beginDraw();
 		layer.background(0, 0, 0);
 		p.fill(255, 255, 255);

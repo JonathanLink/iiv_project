@@ -3,3 +3,5 @@ export.txt
 .classpath
 .project
 .settings/*
+*.jar
+*.log

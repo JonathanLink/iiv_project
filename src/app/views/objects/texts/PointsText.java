@@ -31,7 +31,7 @@ public class PointsText extends AnimatedTextPlate {
 		if (!isAnimationFinished()) {
 			location.y = location.y - Y_SPEED;
 			relativeMaxY = relativeMaxY + Y_SPEED;
-			float red = fontFillColor >> 16 & 0xFF; // faster than fontFillColor.red() (optimizazion purpose)
+			float red = fontFillColor >> 16 & 0xFF; // faster than fontFillColor.red() (optimization purpose)
 			float green = fontFillColor >> 8 & 0xFF;
 			float blue = fontFillColor >> 0xFF;
 			alphaFont = (float) ((-255.0 / RELATIVE_MAX_Y) * relativeMaxY + 255.0);

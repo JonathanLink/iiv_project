@@ -6,12 +6,13 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 
 public class TextPlate extends PlateObject {
-
+	
+	public float fontSize;
+	public int fontFillColor;
+	public int fontStrokeColor;
+	
 	protected String text;
-	protected float fontSize;
 	protected String fontPolice;
-	protected int fontFillColor;
-	protected int fontStrokeColor;
 	protected float x;
 	protected float y;
 	protected float z;

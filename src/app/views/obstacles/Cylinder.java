@@ -1,5 +1,7 @@
 package app.views.obstacles;
 
+import java.util.Date;
+
 import app.views.objects.Ball;
 import app.views.objects.texts.PointsText;
 import processing.core.PApplet;
@@ -16,31 +18,37 @@ public class Cylinder extends PlateObstacleObject {
 	protected PShape cylinder;
 	protected float radius;
 	protected int fillColor;
-
-	protected int previousColor;
-	protected int collisionColor;
+	protected float height;
 	protected static final int CYLINDER_RESOLUTION = 40;
 	protected static final float MIN_VELOCITY_COLLISION = 1.0f;
 	
-
-	public Cylinder(PApplet parent, PlateController plateController, float radius, float centerCoordX, float centerCoordZ, int fillColor) {
+	
+	public Cylinder(PApplet parent, PlateController plateController, float radius, float centerCoordX, float centerCoordZ, int fillColor, String model, float rotateX, float bottomMargin, float height) {
 		super(parent, plateController);
 		this.radius = radius;
 		this.fillColor = fillColor;
-		this.collisionColor = p.color(255, 255, 255);
-		this.previousColor = this.fillColor;
+		this.height = height;
 		cylinder = new PShape();
-		buildCylinder();
+		if(model == null) {
+			buildCylinder();	
+		} else {
+			cylinder = p.loadShape(model);
+			cylinder.scale(1);
+			cylinder.rotateZ(-PApplet.PI);
+			cylinder.rotateX(rotateX);
+			cylinder.translate(0, plate.height + bottomMargin);
+		}
+
 		location.x = centerCoordX;
 		location.z = centerCoordZ;
 	}
 
-	public Cylinder(PApplet parent, PlateController plateController, float radius, float centerCoordX, float centerCoordZ) {
-		this(parent, plateController, radius, centerCoordX, centerCoordZ, parent.color(70, 220, 30));
+	public Cylinder(PApplet parent, PlateController plateController, float radius, float centerCoordX, float centerCoordZ, String model, float rotateX, float bottomMargin, float height) {
+		this(parent, plateController, radius, centerCoordX, centerCoordZ, parent.color(70, 220, 30), model, rotateX, bottomMargin, height);
 	}
 
 	public Cylinder(PApplet parent, PlateController plateController) {
-		this(parent, plateController, Cylinder.CYLINDER_RADIUS, 0, 0);
+		this(parent, plateController, Cylinder.CYLINDER_RADIUS, 0, 0, parent.color(70, 220, 30), null, 0, 0,CYLINDER_HEIGHT );
 	}
 
 	public PVector checkForCollisionWithBall(Ball ball) {
@@ -49,16 +57,15 @@ public class Cylinder extends PlateObstacleObject {
 
 		//test for collisions
 		if (distanceBetweenCenters.mag() < ball.radius + radius ) {
-			
-			plateController.addPoints(PApplet.round(ball.velocity.mag()));
 
 			// user win some points proportioned to the velocity of the ball
 			if (ball.velocity.mag() >= MIN_VELOCITY_COLLISION) {
-				if (fillColor != collisionColor) {
-					previousColor = fillColor;
-					fillColor = collisionColor;
-				}
-				addPointsText(ball.velocity.mag());
+				Date date = new Date();
+				long currentTime = date.getTime() / 1000; 
+				if (currentTime - lastTimePointEarned >= 0.5) {
+					addPointsText(ball.velocity.mag());
+					lastTimePointEarned = currentTime;
+				}	
 			}
 
 			//normalize the vector given by the two centers at the time of the collision
@@ -78,9 +85,8 @@ public class Cylinder extends PlateObstacleObject {
 				ball.velocity = PVector.mult(ball.velocity, 0.5f);
 			}
 			return normal;
-			
+
 		} else {
-			this.fillColor = previousColor;
 			return new PVector(0, 0, 0);
 		}
 	}
@@ -90,7 +96,7 @@ public class Cylinder extends PlateObstacleObject {
 		pGraphics.fill(fillColor);
 		pGraphics.ellipse(location.x, location.z, 2*radius, 2*radius);
 	}
-	
+
 	public boolean isCylindric() {
 		return true;
 	}
@@ -104,9 +110,20 @@ public class Cylinder extends PlateObstacleObject {
 	}
 
 	protected void renderObject() {
-		p.noStroke();
-		p.fill(fillColor);
+
 		p.shape(cylinder);
+
+	}
+
+
+	protected void addPointsText(float velocity) {
+		plateController.addPoints(PApplet.round(velocity));
+		String text = "+"+ PApplet.round(velocity) * 100 +" kCal";
+		PointsText pointsText = new PointsText(p, plateController, text, location.x, location.y - height , location.z);
+		pointsText.fontSize = 70;
+		pointsText.fontFillColor = p.color(0, 255, 0);
+		pointsText.fontStrokeColor = p.color(132, 255, 128);
+		plateController.addAnimatedTextPlate(pointsText);
 	}
 
 
@@ -147,13 +164,8 @@ public class Cylinder extends PlateObstacleObject {
 	}
 
 
-	protected void addPointsText(float velocity) {
-		String text = "+"+ PApplet.round(velocity)+" PTS!";
-		PointsText pointsText = new PointsText(p, plateController, text, location.x, location.y - CYLINDER_HEIGHT, location.z);
-		plateController.addAnimatedTextPlate(pointsText);
-	}
-	
-	
+
+
 
 
 }

@@ -4,12 +4,14 @@ import app.controllers.MainController;
 import app.views.RenderObject;
 import processing.core.PApplet;
 import processing.core.PGraphics;
+import processing.core.PShape;
 
 public class Plate extends RenderObject {
 
-	static final int PLATE_WIDTH = 400;
-	static final int PLATE_HEIGHT = 40;
-	static final int PLATE_DEPTH = 400;
+	static public final boolean LOAD_3D_PLATE = true;
+	static public final int PLATE_WIDTH = 500;
+	static public final int PLATE_HEIGHT = 40;
+	static public final int PLATE_DEPTH = 500;
 
 	public int fillColor;
 	public float width;
@@ -17,7 +19,9 @@ public class Plate extends RenderObject {
 	public float depth;
 	public float speed;
 
-
+	private PShape tray;
+	private PShape wireframeTray;
+	
 	public Plate(PApplet parent) {
 		this(parent,Plate.PLATE_WIDTH, Plate.PLATE_HEIGHT, Plate.PLATE_DEPTH);
 	}
@@ -27,23 +31,66 @@ public class Plate extends RenderObject {
 		this.width = width;
 		this.height = height;
 		this.depth = depth;
-		speed = 1.0f;
+		speed = 0.8f;
 		fillColor = p.color(192, 192, 192);
+		if (LOAD_3D_PLATE) {
+
+			tray = p.loadShape("tray.obj");
+			wireframeTray = p.loadShape("wireframeTray.obj");
+			
+			float scale = 1.45f;
+			float rotateY = PApplet.PI/2.0f;
+			int translateX = -214;
+			int translateY = -10;
+			int translateZ = -150;
+			tray.translate(translateX, translateY, translateZ);
+			tray.scale(scale);
+			tray.rotateY(rotateY);
+			wireframeTray.translate(translateX, translateY, translateZ);
+			wireframeTray.scale(scale);
+			wireframeTray.rotateY(rotateY);
+		
+			
+		}
 	}
 
 	public void updateObject() {
 	}
 
 	public void renderObject() {
-		p.stroke(140.0f, 140.0f, 140.0f);
-		if (angleX > 0.0) {
-			//transparent tilted plate to see the ball
-			p.noFill();
+		
+		
+		if (LOAD_3D_PLATE) {
+			if (angleX > 0.0) {
+				//transparent tilted plate to see the ball
+				//p.stroke(140.0f, 140.0f, 140.0f);
+				p.shape(wireframeTray);
+			}  else {
+				p.shape(tray);
+			}
+			
+			if (MainController.debug) {
+				p.noFill();
+				p.color(0,0,0);
+				p.strokeWeight(5);
+				p.box(this.width, this.height + 20, this.depth);
+			}
 		} else {
-			p.fill(fillColor);
+			p.stroke(140.0f, 140.0f, 140.0f);
+			if (angleX > 0.0) {
+				//transparent tilted plate to see the ball
+				p.noFill();
+			} else {
+				p.fill(fillColor);
+			}
+			p.box(this.width, this.height, this.depth);
 		}
-		p.box(this.width, this.height, this.depth);
-		if (MainController.DEBUG_MODE) drawAxes();
+		
+		
+		
+		
+		
+		if (MainController.debug) drawAxes();
 	}
 
 	public void draw2D(PGraphics pGraphics) {

@@ -23,7 +23,7 @@ public class Cylinder extends PlateObstacleObject {
 	protected static final float MIN_VELOCITY_COLLISION = 1.0f;
 	
 	
-	public Cylinder(PApplet parent, PlateController plateController, float radius, float centerCoordX, float centerCoordZ, int fillColor, String model, float rotateX, float bottomMargin, float height) {
+	public Cylinder(PApplet parent, PlateController plateController, float scaleFactor, float radius, float centerCoordX, float centerCoordZ, int fillColor, String model, float rotateX, float bottomMargin, float height) {
 		super(parent, plateController);
 		this.radius = radius;
 		this.fillColor = fillColor;
@@ -33,7 +33,7 @@ public class Cylinder extends PlateObstacleObject {
 			buildCylinder();	
 		} else {
 			cylinder = p.loadShape(model);
-			cylinder.scale(1);
+			cylinder.scale(scaleFactor);
 			cylinder.rotateZ(-PApplet.PI);
 			cylinder.rotateX(rotateX);
 			cylinder.translate(0, plate.height + bottomMargin);
@@ -43,12 +43,12 @@ public class Cylinder extends PlateObstacleObject {
 		location.z = centerCoordZ;
 	}
 
-	public Cylinder(PApplet parent, PlateController plateController, float radius, float centerCoordX, float centerCoordZ, String model, float rotateX, float bottomMargin, float height) {
-		this(parent, plateController, radius, centerCoordX, centerCoordZ, parent.color(70, 220, 30), model, rotateX, bottomMargin, height);
+	public Cylinder(PApplet parent, PlateController plateController, float scaleFactor, float radius, float centerCoordX, float centerCoordZ, String model, float rotateX, float bottomMargin, float height) {
+		this(parent, plateController,scaleFactor , radius, centerCoordX, centerCoordZ, parent.color(70, 220, 30), model, rotateX, bottomMargin, height);
 	}
 
 	public Cylinder(PApplet parent, PlateController plateController) {
-		this(parent, plateController, Cylinder.CYLINDER_RADIUS, 0, 0, parent.color(70, 220, 30), null, 0, 0,CYLINDER_HEIGHT );
+		this(parent, plateController,1.0f, Cylinder.CYLINDER_RADIUS, 0, 0, parent.color(70, 220, 30), null, 0, 0,CYLINDER_HEIGHT );
 	}
 
 	public PVector checkForCollisionWithBall(Ball ball) {

@@ -13,6 +13,7 @@ abstract class Controller extends Parent {
 	}
 	
 	abstract public void draw();
+	abstract public void update();
 
 	public void keyPressed() {
 	}

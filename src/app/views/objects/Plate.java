@@ -9,9 +9,8 @@ import processing.core.PShape;
 public class Plate extends RenderObject {
 
 	static public final boolean LOAD_3D_PLATE = true;
-	static public final int PLATE_WIDTH = 500;
 	static public final int PLATE_HEIGHT = 40;
-	static public final int PLATE_DEPTH = 500;
+
 
 	public int fillColor;
 	public float width;
@@ -22,11 +21,11 @@ public class Plate extends RenderObject {
 	private PShape tray;
 	private PShape wireframeTray;
 	
-	public Plate(PApplet parent) {
-		this(parent,Plate.PLATE_WIDTH, Plate.PLATE_HEIGHT, Plate.PLATE_DEPTH);
+	public Plate(PApplet parent, float width, float depth, float scale, int translateX, int translateY, int translateZ) {
+		this(parent,width, Plate.PLATE_HEIGHT, depth, scale, translateX, translateY, translateZ);
 	}
 
-	public Plate(PApplet parent, float width, float height, float depth) {
+	public Plate(PApplet parent, float width, float height, float depth, float scale,int translateX, int translateY, int translateZ) {
 		super(parent);
 		this.width = width;
 		this.height = height;
@@ -38,11 +37,7 @@ public class Plate extends RenderObject {
 			tray = p.loadShape("tray.obj");
 			wireframeTray = p.loadShape("wireframeTray.obj");
 			
-			float scale = 1.45f;
 			float rotateY = PApplet.PI/2.0f;
-			int translateX = -214;
-			int translateY = -10;
-			int translateZ = -150;
 			tray.translate(translateX, translateY, translateZ);
 			tray.scale(scale);
 			tray.rotateY(rotateY);

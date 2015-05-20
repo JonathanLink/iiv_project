@@ -32,7 +32,7 @@ public class DataVisualizationLayer extends Layer{
 	private float sliderPositionMin, sliderPositionMax;
 
 	public DataVisualizationLayer(PApplet parent, PlateController plateController) {
-		super(parent, parent.displayWidth,180,0,parent.displayHeight-180);
+		super(parent, parent.width,180,0,parent.height-180);
 		this.plateController = plateController;
 
 		//dimension of each component

@@ -9,13 +9,13 @@ public class ConsoleLayer extends Layer {
 	private ArrayList<String> logs;
 
 	public ConsoleLayer(PApplet parent) {
-		super(parent, parent.displayWidth, 105,0,0);
+		super(parent, parent.width, 105,0,0);
 		logs = new ArrayList<String>();
 	}
 
 	public void write(String log) {
 		logs.add(log);
-		System.out.println(log);
+		//System.out.println(log);
 	}
 
 	protected void drawMyLayer() {

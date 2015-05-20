@@ -1,16 +1,21 @@
 package app.controllers;
+
 import app.layers.ConsoleLayer;
 import processing.core.*;
 import processing.event.MouseEvent;
 
 
 public class MainController extends PApplet {
-
+	
+	public static final int WINDOW_WIDTH = 1280;
+	public static final int WINDOW_HEIGHT = 800;
+	
 	public final static int FRAME_RATE = 30;
-	public final static int PLATE_MODE = 0;
-	public final static int EDIT_MODE = 1;
-	public final static int MENU_MODE = 2;
-	public final static int SETTINGS_MODE = 3;
+	public final static int PLATE_VIEW = 0;
+	public final static int EDIT_VIEW = 1;
+	public final static int MENU_VIEW = 2;
+	public final static int SETTINGS_VIEW = 3;
+	public final static int MODE_VIEW= 4;
 	
 	public static boolean debug = false;
 	public static boolean webcamEnabled = false;
@@ -23,28 +28,32 @@ public class MainController extends PApplet {
 	private static MainMenuController menuController;
 	private static PlateController plateController;
 	private static EditController editController;
+	private static Controller modeController;
 	private static Controller currentController;
 
 	// SerialVersionUID (to please to Eclipse...)
 	private static final long serialVersionUID = 1L;
 
 	public static void main(String args[]) {
-		PApplet.main(new String[] { "--present", "app.controllers.MainController" });
+		PApplet.main(new String[] { "--present","--bgcolor=#000000", "--hide-stop", "app.controllers.MainController" });
 	}
 	
 	public static void setMode(int mode) {
 		switch(mode) {
-		case PLATE_MODE:
+		case PLATE_VIEW:
 			currentController = plateController; 
 			break;
-		case EDIT_MODE:
+		case EDIT_VIEW:
 			currentController = editController;
 			break;
-		case MENU_MODE:
+		case MENU_VIEW:
 			currentController = menuController;
 			break;
-		case SETTINGS_MODE:
+		case SETTINGS_VIEW:
 			currentController = settingsController;
+			break;
+		case MODE_VIEW:
+			currentController = modeController;
 			break;
 		default:
 			println("[ERROR] MODE DOES NOT EXIST!");
@@ -57,8 +66,8 @@ public class MainController extends PApplet {
 	}
 
 	public void setup() {
-		size(displayWidth, displayHeight, P3D);
-		//size(1280, 800, P3D);
+		//size(displayWidth, displayHeight, P3D)
+		size(WINDOW_WIDTH, WINDOW_HEIGHT, P3D);	
 		frameRate(FRAME_RATE);
 		
 		// Set console
@@ -76,18 +85,29 @@ public class MainController extends PApplet {
 		// Init EditController
 		editController = new EditController(this, plateController);
 		
+		// Init ModeController
+		modeController = new ModeController(this);
+		
 		// Set current mode
-		MainController.setMode(SETTINGS_MODE);
+		//MainController.setMode(SETTINGS_VIEW);
+		
+		// ************** TO DEBUG ***********
+		MainController.webcamEnabled = true;
+		MainController.setMode(PLATE_VIEW);
+		plateController.setGameMode(PlateController.GameMode.EAT_ALL); 
+		// ********************************
 
 	}
 
 	public void draw() {
+		
+		currentController.update();
+		
 		cursor(ARROW);
-
+		
 		setCamera();
 		setBackground();	
-
-		//Do not change the order of the draw functions : first the window displays (layers), second the game display (plate,ball)
+		
 		pushMatrix();
 		currentController.draw();
 		popMatrix();
@@ -102,18 +122,14 @@ public class MainController extends PApplet {
 		if (keyCode == LETTER_D) {
 			debug = !debug;
 		} else if (keyCode == LETTER_M) {
-			MainController.setMode(MENU_MODE);
+			MainController.setMode(MENU_VIEW);
 		}
 		currentController.keyPressed();
 	}
 
 	public void keyReleased() {
-		/*
-		if (key == CODED && keyCode == SHIFT) {
-			MainController.setMode(PLATE_MODE);
-		}
 		currentController.keyReleased();
-		*/
+		
 	}
 
 	public void mouseDragged() {

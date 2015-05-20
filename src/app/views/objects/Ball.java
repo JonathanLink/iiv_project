@@ -8,9 +8,6 @@ import processing.core.PVector;
 
 public class Ball extends PlateObject {
 
-	public static final float BALL_RADIUS = 20.0f;
-
-
 	public int fillColor;
 	public float radius;
 
@@ -22,8 +19,8 @@ public class Ball extends PlateObject {
 		location.y = PApplet.round(-plate.height/2.0f - radius);
 	}
 
-	public Ball(PApplet parent, PlateController plateController) {
-		this(parent, plateController, Ball.BALL_RADIUS, parent.color(255, 50, 10));
+	public Ball(PApplet parent, PlateController plateController, float radius) {
+		this(parent, plateController, radius, parent.color(255, 50, 10));
 	}
 
 

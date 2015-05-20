@@ -20,7 +20,7 @@ public class SettingsController extends Controller implements ButtonListener{
 		super(parent);
 		backgroundImage = p.loadImage(BACKGROUND_FILE);
 		settingsTitleImage = p.loadImage(SETTINGS_TITLE_FILE);
-		mouseButton = new MenuButton(p, 400, p.displayHeight * 0.40f, 400, 100, "> MOUSE", this);
+		mouseButton = new MenuButton(p, 400, p.height * 0.40f, 400, 100, "> MOUSE", this);
 		webcamButton = new MenuButton(p, 400, mouseButton.y + mouseButton.height + 40, 400, 100, "> WEBCAM", this);
 		
 	}
@@ -29,8 +29,8 @@ public class SettingsController extends Controller implements ButtonListener{
 	@Override
 	public void draw() {
 		p.background(0, 0, 0);
-		p.image(backgroundImage, 0, 0, p.displayWidth, p.displayHeight);
-		p.image(settingsTitleImage, PApplet.round(p.displayWidth/2.0f - settingsTitleImage.width/2.0f), 0);
+		p.image(backgroundImage, 0, 0, p.width, p.height);
+		p.image(settingsTitleImage, PApplet.round(p.width/2.0f - settingsTitleImage.width/2.0f), 0);
 		mouseButton.draw();
 		webcamButton.draw();
 	}
@@ -50,7 +50,14 @@ public class SettingsController extends Controller implements ButtonListener{
 			MainController.webcamEnabled = true;
 		}
 		
-		MainController.setMode(MainController.MENU_MODE);
+		MainController.setMode(MainController.MENU_VIEW);
+		
+	}
+
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
 		
 	}
 

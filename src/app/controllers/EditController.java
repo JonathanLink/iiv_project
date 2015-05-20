@@ -43,8 +43,6 @@ class EditController extends Controller implements ButtonListener {
 
 	public EditController(PApplet parent, PlateController plateController) {
 		super(parent);
-		this.plate = plateController.plate;
-		this.ball = plateController.ball;
 		this.plateController = plateController;
 		
 		// init plate obstacle object
@@ -64,24 +62,26 @@ class EditController extends Controller implements ButtonListener {
 		// buttons
 		backgroundImage = p.loadImage(BACKGROUND_FILE);
 		editTitleImage = p.loadImage(EDIT_TITLE_FILE);
-		cancelButton = new MenuButton(p, 0, p.displayHeight * 0.90f, 400, 80, "CANCEL", this);
-		playButton = new MenuButton(p, p.displayWidth - 200, p.displayHeight * 0.90f, 400, 80, "PLAY!", this);
+		cancelButton = new MenuButton(p, 0, p.height * 0.90f, 400, 80, "CANCEL", this);
+		playButton = new MenuButton(p, p.width - 200, p.height * 0.90f, 400, 80, "PLAY!", this);
 		
 	}
 	
 	public void init() {
 		plateController.removeAllPlateObstacles();
+		this.plate = plateController.plate;
+		this.ball = plateController.ball;
 	}
 
 	public void draw() {
 		
 		p.background(0, 0, 0);
-		p.image(backgroundImage, 0, 0, p.displayWidth, p.displayHeight);
-		p.image(editTitleImage, PApplet.round(p.displayWidth/2.0f - editTitleImage.width/2.0f), 0);
+		p.image(backgroundImage, 0, 0, p.width, p.height);
+		p.image(editTitleImage, PApplet.round(p.width/2.0f - editTitleImage.width/2.0f), 0);
 		cancelButton.draw();
 		playButton.draw();
 		
-		setOrigin(p.displayWidth/2.0f, p.displayHeight/2.0f, 0); 
+		setOrigin(p.width/2.0f, p.height/2.0f, 0); 
 
 		//draw the plate in 2D
 		p.pushMatrix();
@@ -103,7 +103,7 @@ class EditController extends Controller implements ButtonListener {
 		}
 		
 		// draw buttons	
-		setOrigin(-p.displayWidth/2.0f, -p.displayHeight/2.0f, 0); 
+		setOrigin(-p.width/2.0f, -p.height/2.0f, 0); 
 		burgerButton.draw();
 		movingBurgerButton.draw();
 		friesButton.draw();
@@ -160,9 +160,9 @@ class EditController extends Controller implements ButtonListener {
 		} else if (button == clearButton) {
 			obstacles.removeAll(obstacles);
 		} else if (button == cancelButton) {
-			MainController.setMode(MainController.MENU_MODE);
+			MainController.setMode(MainController.MENU_VIEW);
 		} else if (button == playButton) {
-			MainController.setMode(MainController.PLATE_MODE);
+			MainController.setMode(MainController.PLATE_VIEW);
 			PlateController plateController = (PlateController) MainController.getCurrentControler();
 			plateController.loadPlateObstacles(obstacles);
 		}
@@ -198,11 +198,17 @@ class EditController extends Controller implements ButtonListener {
 	
 	//methods that return the mouse click in the game coordinates, i.e with the origin in the middle of the window
 	private int getCoordX() {
-		return PApplet.round(p.mouseX - p.displayWidth/2.0f);
+		return PApplet.round(p.mouseX - p.width/2.0f);
 	}
 
 	private int getCoordY() {
-		return PApplet.round(p.mouseY - p.displayHeight/2.0f);
+		return PApplet.round(p.mouseY - p.height/2.0f);
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
 	}
 
 

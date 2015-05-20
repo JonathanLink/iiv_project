@@ -17,8 +17,8 @@ public class MovingCylinder extends Cylinder {
 		init();
 	}
 
-	public MovingCylinder(PApplet parent,PlateController plateController, float radius, float centerCoordX, float centerCoordZ, int fillColor, String model, float rotateX, float bottomMargin, float height) {
-		super(parent, plateController, radius, centerCoordX, centerCoordZ, fillColor, model, rotateX, bottomMargin, height);
+	public MovingCylinder(PApplet parent,PlateController plateController, float scaleFactor, float radius, float centerCoordX, float centerCoordZ, int fillColor, String model, float rotateX, float bottomMargin, float height) {
+		super(parent, plateController, scaleFactor, radius, centerCoordX, centerCoordZ, fillColor, model, rotateX, bottomMargin, height);
 		init();
 	}
 
@@ -27,7 +27,7 @@ public class MovingCylinder extends Cylinder {
 		super.updateObject();
 		
 		if (leftToRight) {
-			if (location.x + velocity.x < plate.width/2.0 - CYLINDER_RADIUS - 2 * Ball.BALL_RADIUS) {
+			if (location.x + velocity.x < plate.width/2.0 - CYLINDER_RADIUS - 2 * radius) {
 				location.x = location.x + velocity.x;
 				//location.y = 20.0f * PApplet.cos(1.0f/10.0f * p.frameCount) - 20; // décommente cette ligne si tu veux faire sautiller le cylindre ^^
 			} else {
@@ -36,7 +36,7 @@ public class MovingCylinder extends Cylinder {
 			}
 		}
 		if (!leftToRight) {
-			if (location.x + velocity.x > -plate.width/2.0 + CYLINDER_RADIUS + 2 * Ball.BALL_RADIUS) {
+			if (location.x + velocity.x > -plate.width/2.0 + CYLINDER_RADIUS + 2 * radius) {
 				location.x = location.x + velocity.x;
 			} else { 
 				leftToRight = true;

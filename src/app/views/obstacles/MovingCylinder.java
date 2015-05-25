@@ -5,6 +5,7 @@ import java.util.Date;
 import processing.core.PApplet;
 import processing.core.PVector;
 import app.controllers.PlateController;
+import app.controllers.PlateController.GameMode;
 import app.views.objects.Ball;
 
 public class MovingCylinder extends Cylinder {
@@ -70,6 +71,11 @@ public class MovingCylinder extends Cylinder {
 
 		//test for collisions
 		if (distanceBetweenCenters.mag() < ball.radius + radius ) {
+			
+			if (plateController.gameMode == GameMode.EAT_ALL) {
+				addPointsText(ball.velocity.mag());
+				return new PVector(0, 0, 0);
+			}
 			
 			PVector ballDeltaLocation = distanceBetweenCenters.get();
 			ballDeltaLocation.setMag((ball.radius + radius) - distanceBetweenCenters.mag());

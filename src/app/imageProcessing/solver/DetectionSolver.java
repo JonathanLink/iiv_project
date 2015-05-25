@@ -11,7 +11,7 @@ import java.util.*;
 
 public class DetectionSolver extends Parent{
 
-	public static float scale = 0.5f;
+	public static float scale = 0.35f;
 
 	//variable for lines detections
 	private float discretizationStepsPhi; 

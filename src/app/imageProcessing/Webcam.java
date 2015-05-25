@@ -21,7 +21,7 @@ public class Webcam extends Parent{
 	private final static boolean INTERACTION_MODE = true;
 	public final static int PROCESS_EACH_X_FRAME = 10;
 
-	public static float scale = 0.5f;
+	public static float scale = 0.35f;
 	private PlateController plateController;
 	private float linearIncrementX;
 	private float linearIncrementZ;

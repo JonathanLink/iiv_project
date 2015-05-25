@@ -227,11 +227,11 @@ public class PlateController extends Controller implements AnimatedTextListener{
 			plate.angleZ = 0;
 		}
 		
-		if (MainController.webcamEnabled) {
+		if (true || MainController.webcamEnabled) {
 			int posy = (plate.angleX > 0.0) ? 270 : -390;
-			int x = -160;
+			int x = -50; // -160
 			webcam.draw(x, posy);
-			drawMap(x + webcam.drawWidth + 5  , posy);
+			//drawMap(x + webcam.drawWidth + 5  , posy);
 		}
 		
 	

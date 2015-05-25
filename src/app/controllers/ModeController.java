@@ -13,15 +13,18 @@ import app.views.obstacles.PlateObstacleType;
 public class ModeController extends Controller implements ButtonListener {
 	
 	private static final String BACKGROUND_FILE = "modeBackground.png";
+	private static final String MODE_TITLE_FILE = "modeTitle.png";
 	
 	private PImage backgroundImage;
+	private PImage modeTitleImage;
 	private MenuButton classicButton;
 	private MenuButton eatAllButton;
 	
 	public ModeController(PApplet parent) {
 		super(parent);
 		backgroundImage = p.loadImage(BACKGROUND_FILE);
-		classicButton = new MenuButton(p, 400, p.height * 0.40f, 400, 100, "> CLASSIC", this);
+		modeTitleImage = p.loadImage(MODE_TITLE_FILE);
+		classicButton = new MenuButton(p, 400, p.height * 0.42f, 400, 100, "> CLASSIC", this);
 		eatAllButton = new MenuButton(p, 400, classicButton.y + classicButton.height + 40, 400, 100, "> EAT ALL", this);
 	}
 
@@ -29,6 +32,7 @@ public class ModeController extends Controller implements ButtonListener {
 	public void draw() {
 		p.background(0, 0, 0);
 		p.image(backgroundImage, 0, 0, p.width, p.height);
+		p.image(modeTitleImage, PApplet.round(p.width/2.0f - modeTitleImage.width/2.0f), 0);
 		classicButton.draw();
 		eatAllButton.draw();
 	}
@@ -49,7 +53,8 @@ public class ModeController extends Controller implements ButtonListener {
 			plateController.setGameMode(PlateController.GameMode.CLASSIC); 
 			loadDefaultPlateObstacles();
 		} else {
-			plateController.setGameMode(PlateController.GameMode.EAT_ALL); 
+			plateController.setGameMode(PlateController.GameMode.EAT_ALL);
+			MainController.setMode(MainController.EDIT_VIEW);
 		}
 		
 	}

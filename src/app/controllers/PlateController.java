@@ -1,5 +1,7 @@
 package app.controllers;
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 
 import app.imageProcessing.Webcam;
@@ -9,6 +11,7 @@ import app.views.objects.Ball;
 import app.views.objects.Plate;
 import app.views.objects.PlateObject;
 import app.views.objects.texts.AnimatedTextPlate;
+import app.views.objects.texts.PointsText;
 import app.views.objects.texts.StartCountdown;
 import app.views.obstacles.Cylinder;
 import app.views.obstacles.MovingCylinder;
@@ -16,6 +19,7 @@ import app.views.obstacles.PlateEdges;
 import app.views.obstacles.PlateObstacleObject;
 import app.views.obstacles.PlateObstacleType;
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PVector;
 import processing.event.MouseEvent;
 
@@ -24,49 +28,70 @@ public class PlateController extends Controller implements AnimatedTextListener{
 	public enum GameMode {
 		CLASSIC, EAT_ALL
 	}
-
-	public static final int COUNTDOWN = 15;  // sec
+	
+	public static final boolean START_COUNTER = true;
+	public static final int COUNTDOWN = 30;  // sec
 	public Plate plate;
 	public Ball ball;
 	public ArrayList<PlateObstacleObject> obstacleList;
-	public float totalScore;
+	public int totalScore;
 	public float gainPoints;
 	public boolean locked;
 	public GameMode gameMode;
-
-
-	private static final float GRAVITY_CONST = 0.04f;  // 0.05 initially 0.1
+	
+	
+	
+	private static final float GRAVITY_CONST_MOUSE = 0.05f;  
+	private static final float FRICTION_COEF_MOUSE = 0.005f;
+	
+	private static final float GRAVITY_CONST_WEBCAM = 0.04f;  
+	private static final float FRICTION_COEF_WEBCAM = 0.001f;
+	
 	private static final float LIMIT_ANGLE = 60.0f; //angle in degree
 	private static final float SPEED_MIN = 0.5f;
 	private static final float SPEED_MAX = 1.5f;
 	private static final float SPEED_STEP = 0.05f;
-	private static final float FRICTION_COEF = 0.001f;
+	private static final int NUMBER_OF_OBSTACLES_EAT_MODE = 5;
 	private static final String BURGER_OBJ_FILE_PATH = "burger.obj";
 	private static final String FRIES_OBJ_FILE_PATH = "fries.obj";
 	private static final String DRINK_OBJ_FILE_PATH = "drink.obj";
-
+	private static final String LOGO_SMALL_FILE = "logoSmall.png";
+	
+	private  float gravityCoef; 
+	private  float frictionCoef;
 	private ArrayList<AnimatedTextPlate> animatedTextList;
+	private ArrayList<PlateObstacleObject> obstaclesToRemoveList;
 	private DataVisualizationLayer dataVisualizationLayer;
-	private PlateEdges plateEdges;
+	public PlateEdges plateEdges;
 	private int countdown;
-	private double lastTime;
+	private long lastTimeDown;
+	private int countup;
+	private double lastTimeUp;
 	private StartCountdown startCountDown3;
 	private StartCountdown startCountDown2;
 	private StartCountdown startCountDown1;
 	private StartCountdown startCountDownGo;
 	private boolean gameStart;
 	private ArrayList<AnimatedTextPlate> futureAnimatedTextList;
+	private int numberOfHit;
 	private Webcam webcam;
-
+	private boolean gameIsFinished;
+	private boolean isInputEnabled;
+	private PImage logoImage;
+	private Date date = new Date();
 	
+	
+	private long lastTimeScored;
 	
 	public PlateController(PApplet parent) {
 		super(parent);
 		this.obstacleList = new ArrayList<PlateObstacleObject>();
 		this.animatedTextList = new ArrayList<AnimatedTextPlate>();
 		this.futureAnimatedTextList = new ArrayList<AnimatedTextPlate>();
+		this.obstaclesToRemoveList = new ArrayList<PlateObstacleObject>();
 		this.gameMode = GameMode.CLASSIC;
 		webcam = new Webcam(parent);
+		logoImage = p.loadImage(LOGO_SMALL_FILE);
 		
 	}
 
@@ -76,8 +101,11 @@ public class PlateController extends Controller implements AnimatedTextListener{
 
 	public void setGameMode(GameMode gameMode) {
 		this.gameMode = gameMode;
-
-		this.plate = (gameMode == GameMode.EAT_ALL) ? new Plate(p, 600, 600, 1.75f,-255, -10, -190) : new Plate(p, 500, 500, 1.45f, -214, -10, -150);
+		
+		this.gravityCoef = (MainController.webcamEnabled) ? GRAVITY_CONST_WEBCAM : GRAVITY_CONST_MOUSE;
+		this.frictionCoef = (MainController.webcamEnabled) ? FRICTION_COEF_WEBCAM : FRICTION_COEF_MOUSE;
+		
+		this.plate = (gameMode == GameMode.EAT_ALL) ? new Plate(p, 600, 600, 1.75f,-257, -10, -183) : new Plate(p, 500, 500, 1.45f, -214, -10, -150);
 		this.ball = (gameMode == GameMode.EAT_ALL) ?  new Ball(p, this, 10) : new Ball(p, this, 20);
 		this.plateEdges = new PlateEdges(p, this);
 		this.dataVisualizationLayer = new DataVisualizationLayer(p, this); 
@@ -87,17 +115,26 @@ public class PlateController extends Controller implements AnimatedTextListener{
 		this.ball.angleZ = 0;
 		this.ball.location.x = 0;
 		this.ball.location.z = 0;
-		this.totalScore = 0f;
+		this.totalScore = 0;
 		this.countdown = COUNTDOWN;
-		this.gameStart = true;
+		this.countup = 0;
+		this.numberOfHit = 0;
+		this.gameStart = false;
+		this.gameIsFinished = false;
+		this.isInputEnabled = true;
 		this.animatedTextList.removeAll(animatedTextList);
 		this.futureAnimatedTextList.removeAll(futureAnimatedTextList);
 
 		removeAllPlateObstacles();
 
 		// Start 3-2-1-GO coutdown 
-		startCountDown3 = new StartCountdown(p, this, "3", -100, 0, 1000);
-		//addAnimatedTextPlate(startCountDown3);
+		if (START_COUNTER) {
+			startCountDown3 = new StartCountdown(p, this, "3", 0, 0, 1000);
+			addAnimatedTextPlate(startCountDown3);
+		} else {
+			gameStart = true;
+		}
+
 	}
 
 
@@ -118,37 +155,73 @@ public class PlateController extends Controller implements AnimatedTextListener{
 		animatedTextList.add(animatedTextPlate);
 	}
 
-	public void addPoints(float gainPoints) {
+	public void addPoints(float gainPoints, PlateObstacleObject obstacle) {
 		this.gainPoints = gainPoints;
-		totalScore += gainPoints;
+		totalScore += (gainPoints * 100);
+		totalScore = (totalScore < 0) ? 0 : totalScore;
+		if (gameMode == GameMode.EAT_ALL) {
+			if (obstacle != plateEdges) {
+				numberOfHit = numberOfHit + 1;
+				obstaclesToRemoveList.add(obstacle);
+			}
+		}
+	
+		lastTimeScored = date.getTime() / 1000;
 	}
 
 	public void update() {
-		// webcamInput
-		if (MainController.webcamEnabled) {
-			webcamInput();
+		
+		if (isGameFinished()) {
+			gameIsFinished = true;
+			isInputEnabled = false;
+			updateAllObjects();
+		} else {
+			if (MainController.webcamEnabled) {
+				webcamInput();
+			}
+			updateAllObjects();
 		}
-		updateAllObjects();
+		
+		
 	}
 
 	public void draw() {
-		
+
 		if(MainController.debug) {
 			dataVisualizationLayer.draw();
 		}
-		p.camera(p.width/2.0f, p.height/2.0f, (p.height/2.0f) / PApplet.tan(PApplet.PI*30.0f / 180.0f) + 200, p.width/2.0f, p.height/2.0f, 0, 0, 1, 0);
+		
+	
 		displayCountdown();
-		p.lights();
 		setOrigin(p.width/2.0f, p.height/2.0f, 0); //the origin of the plate is at the middle point of the window
+		p.image(logoImage, p.width/2.0f - logoImage.width - 10 , p.height/2.0f - logoImage.height - 10 ); // draw logo in bottom right corner
+		p.lights();
 		renderAllObjects();
-		p.camera();
+	
+		
+		if (gameMode == GameMode.EAT_ALL) {
+			p.noLights();
+			setOrigin(-p.width/2.0f,- p.height/2.0f, 0);
+			displayEatenObstaclesCounter();
+			displayScore();
+			displayCountup();
+			
+		}
+		
+		if (gameIsFinished) {
+			setOrigin(p.width/2.0f, p.height/2.0f, 0);
+			displayEndPanel();
+			plate.angleX = -30;
+			plate.angleZ = 0;
+		}
 		
 		if (MainController.webcamEnabled) {
-			p.noLights();
+			setOrigin(-p.width/2.0f, -p.height/2.0f, 0);
 			webcam.draw();
 		}
 		
-
+	
+		
 	}
 
 
@@ -163,7 +236,7 @@ public class PlateController extends Controller implements AnimatedTextListener{
 	}
 
 	public void mouseDragged() {  
-		if (gameStart) {
+		if (gameStart && isInputEnabled) {
 			if (!MainController.webcamEnabled) {
 				mouseInput();
 			}
@@ -173,18 +246,12 @@ public class PlateController extends Controller implements AnimatedTextListener{
 
 
 	public void keyPressed() {
-		/*if(MainController.webcamEnabled || MainController.debug) {
-			final int LETTER_R = 82;
-			if (p.keyCode == LETTER_R) {
-				resetPlatePosition();
-			} 
-		}*/
-		
-		/*if (gameMode == GameMode.EAT_ALL) {
+
+		if (gameMode == GameMode.EAT_ALL) {
 			if (p.key == PApplet.CODED && p.keyCode == PApplet.SHIFT) {
 				MainController.setMode(MainController.EDIT_VIEW);
 			}
-		}*/
+		}
 		
 		final int LETTER_R = 82;
 		final int LETTER_I = 73;
@@ -231,15 +298,15 @@ public class PlateController extends Controller implements AnimatedTextListener{
 	@Override
 	public void animatedTextHasFinishedHalfWay(AnimatedTextPlate animatedTextPlate) {
 		if (animatedTextPlate == startCountDown3) {
-			startCountDown2 = new StartCountdown(p, this, "2", -100, 0, 1000);
+			startCountDown2 = new StartCountdown(p, this, "2", 0, 0, 1000);
 			futureAnimatedTextList.add(startCountDown2);
 		} else if (animatedTextPlate == startCountDown2) {
-			startCountDown1 = new StartCountdown(p, this, "1", -100, 0, 1000);
+			startCountDown1 = new StartCountdown(p, this, "1",0, 0, 1000);
 			futureAnimatedTextList.add(startCountDown1);
 		} else if (animatedTextPlate == startCountDown1) {
-			startCountDownGo = new StartCountdown(p, this, "EAT!", -150, 0, 1000);
+			PointsText eatAnimatedText = new PointsText(p, this, "EAT!", 0, 0, 150, 400, p.color(255,0,0),3.0f);
 			gameStart = true;
-			futureAnimatedTextList.add(startCountDownGo);
+			futureAnimatedTextList.add(eatAnimatedText);
 		} 
 	}
 
@@ -253,22 +320,93 @@ public class PlateController extends Controller implements AnimatedTextListener{
 	}
 
 
+	private boolean isGameFinished() {
+		if (gameMode == GameMode.CLASSIC) {
+			return countdown <= 0;
+		} else if (gameMode == GameMode.EAT_ALL) {
+			return numberOfHit == NUMBER_OF_OBSTACLES_EAT_MODE;
+		}
+		return true;
+	}
+		
 	private void displayCountdown() {
 		if (gameStart) {
-			if (p.millis() - lastTime >= 1000) {
+			if (p.millis() - lastTimeDown >= 1000) {
 				countdown = countdown - 1;
-				lastTime = p.millis();
+				lastTimeDown = p.millis();
 			}
 
-			int fontSize = (countdown <= 10) ? 250 : 200;
-			int fontColor = (countdown <= 10) ? p.color(255,0,0) : p.color(0,0,0);
+			int fontColor = (countdown <= 10) ? p.color(1,0,0) : p.color(0,0,0);
 
-			p.textSize(fontSize);
+			p.textSize(80);
 			p.textAlign(PApplet.CENTER);
 			p.fill(fontColor);
-			p.text(""+countdown, p.width/2.0f - 50, 50);
+			p.text(""+countdown, -100, 50);
 		}
 	}
+	
+	private void displayEatenObstaclesCounter() {
+		if (gameStart) {
+			p.textSize(100);
+			p.textAlign(PApplet.LEFT);
+			p.fill(p.color(255,0,0));
+			p.text(numberOfHit + "/" + NUMBER_OF_OBSTACLES_EAT_MODE ,0, 100);
+		}
+	}
+	
+	private void displayScore() {
+		if (gameStart) {
+			p.textSize(100);
+			p.textAlign(PApplet.RIGHT);
+			p.fill(0,255,0);
+			p.text(totalScore, p.width - 200, 100);
+			p.fill(0,0,0);
+			p.textSize(50);
+			p.text("kcal", p.width - 100, 100);
+		}
+	}
+	
+	private void displayCountup() {
+		if (gameStart) {
+			if (p.millis() - lastTimeUp >= 1000) {
+				countup = countup + 1;
+				lastTimeUp = p.millis();
+			}
+			p.textSize(30);
+			p.textAlign(PApplet.LEFT);
+			p.fill(p.color(0,0,0));
+			p.text(countup / 60 , 0, p.height - 25);
+			p.textSize(20);
+			p.fill(p.color(255,0,0));
+			p.text(" min", 15, p.height - 25);
+			p.textSize(30);
+			p.fill(p.color(0,0,0));
+			int sec = countup % 60;
+			String secString = (String) ((sec < 10) ? "0"+sec : ""+sec);
+			p.text(secString, 60, p.height - 25);
+			p.textSize(20);
+			p.fill(p.color(255,0,0));
+			p.text(" sec", 85, p.height - 25);
+		}
+	}
+	
+	private void displayEndPanel() {
+		/*p.fill(255,225,0);
+		p.stroke(255,0,0);
+		p.strokeWeight(10);
+		float panelWidth = 800;
+		float panelHeight = 500;
+		p.rect(p.width/2 - panelWidth/2, p.height / 2 - panelHeight/2 , panelWidth, panelHeight, 7);
+		p.textSize(120);
+		p.textAlign(PApplet.CENTER);
+		p.fill(255,0,0);
+		p.text("ROUND FINISHED!" , p.width/2, 100);*/
+		p.textSize(90);
+		p.textAlign(PApplet.CENTER);
+		p.fill(255,0,0);
+		p.text("ROUND FINISHED!" , 0, -200);
+	}
+	
 
 
 	private void addPlateObstacle(PlateObstacleObject obstacle) {
@@ -285,10 +423,20 @@ public class PlateController extends Controller implements AnimatedTextListener{
 			addFrictionForce(ball);
 			ball.update();
 		}
+		removeObstaclesToRemove();
 		updateAnimatedTextPlate();
 		addAnimatedTextPlateFromList();
 	}
-
+	
+	private void removeObstaclesToRemove() {
+		Iterator<PlateObstacleObject> iterator = obstaclesToRemoveList.iterator();
+		while (iterator.hasNext ()) {
+			PlateObstacleObject obstacle = iterator.next();
+			obstacleList.remove(obstacle);
+			iterator.remove();
+		}
+	}
+	
 	private void addAnimatedTextPlateFromList() {
 		Iterator<AnimatedTextPlate> iterator = futureAnimatedTextList.iterator();
 		while (iterator.hasNext ()) {
@@ -321,13 +469,13 @@ public class PlateController extends Controller implements AnimatedTextListener{
 	}
 
 	private void addFrictionForce(PlateObject plateObject) {
-		PVector frictionForce = plateObject.generateFrictionForce(FRICTION_COEF);
+		PVector frictionForce = plateObject.generateFrictionForce(frictionCoef);
 		plateObject.applyForce(frictionForce);
 	}
 
 	private void addGravity(PlateObject plateObject) {
-		plateObject.gravity.x = PApplet.sin(PApplet.radians(plate.angleZ)) * GRAVITY_CONST;
-		plateObject.gravity.z = -PApplet.sin(PApplet.radians(plate.angleX)) * GRAVITY_CONST;
+		plateObject.gravity.x = PApplet.sin(PApplet.radians(plate.angleZ)) * gravityCoef;
+		plateObject.gravity.z = -PApplet.sin(PApplet.radians(plate.angleX)) * gravityCoef;
 		plateObject.applyForce(plateObject.gravity);
 	}
 
@@ -356,9 +504,15 @@ public class PlateController extends Controller implements AnimatedTextListener{
 
 	}
 
-	private void webcamInput() {
+	/*private void webcamInput() {
 		// webcam 
+		
+		//long start = System.currentTimeMillis();
 		webcam.update();
+		//long estimatedTime = System.currentTimeMillis() - start;
+		//if (estimatedTime > 200) System.err.println("webcam update [MS] = " + estimatedTime);
+		
+		
 		PVector angles = webcam.getAngles();
 		
 		plate.angleX = angles.x;
@@ -368,8 +522,33 @@ public class PlateController extends Controller implements AnimatedTextListener{
 		MainController.consoleLayer.write("[WEBCAM] angles X = " + plate.angleX);
 		MainController.consoleLayer.write("[WEBCAM] angles = " + angles);
 		MainController.consoleLayer.write("-----------------------------");
+	}*/
+	
+	
+	private void webcamInput() {
+		// webcam 
+		webcam.update();
+		PVector angles = webcam.getAngles();
+		
+		int deltaAngle = 5;
+		
+		if (angles.x <= LIMIT_ANGLE && angles.x >= -LIMIT_ANGLE && Math.abs(plate.angleX-angles.x) > deltaAngle) {
+			plate.angleX = angles.x;
+		} 
+		if (angles.y <= LIMIT_ANGLE && angles.y >= -LIMIT_ANGLE && Math.abs(plate.angleZ-angles.y) > deltaAngle) {
+			plate.angleZ = angles.y;
+		}
+
 	}
 
+	
+	private void displayBanner() {
+		long currentTime = date.getTime() / 1000;
+		if (currentTime - lastTimeScored >= 15) {
+			
+		}
+	}
+	
 
 
 }

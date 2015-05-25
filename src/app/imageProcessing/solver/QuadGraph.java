@@ -64,7 +64,7 @@ public class QuadGraph {
 						);
 			}
 		}
-		System.out.println("There are " + cycles.size() + " cycle(s) in the graph build from the lines ");
+		//System.out.println("There are " + cycles.size() + " cycle(s) in the graph build from the lines ");
 		return cycles;
 	}
 
@@ -224,7 +224,7 @@ public class QuadGraph {
 				|| (i1<0 && i2<0 && i3<0 && i4<0))
 			return true;
 		else 
-			System.out.println("Eliminating non-convex quad...");
+			//System.out.println("Eliminating non-convex quad...");
 		return false;
 	}
 
@@ -246,7 +246,7 @@ public class QuadGraph {
 
 		boolean valid = (area < max_area && area > min_area);
 
-		if (!valid) System.out.println("Eliminating quad with area out of range (" +area +") ...");
+		//if (!valid) System.out.println("Eliminating quad with area out of range (" +area +") ...");
 
 		return valid;
 	}
@@ -273,7 +273,7 @@ public class QuadGraph {
 			return true;
 		}
 		else {
-			System.out.println("Eliminating non square quad ...");
+			//System.out.println("Eliminating non square quad ...");
 			return false;
 		}
 	}

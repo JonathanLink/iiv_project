@@ -1,6 +1,6 @@
 bin/*
 export.txt
-.classpath
 .settings/*
+.classpath
 *.jar
 *.log

@@ -1,10 +1,10 @@
 package app.controllers;
 
-import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
+import app.controllers.PlateController.GameMode;
 import app.listener.ButtonListener;
 import app.views.objects.Ball;
 import app.views.objects.Plate;
@@ -17,16 +17,12 @@ import app.views.button.MenuButton;
 class EditController extends Controller implements ButtonListener {
 	
 	private static final String BACKGROUND_FILE = "editBackground.png";
-	private static final String EDIT_TITLE_FILE = "editTitle.png";
 	
-	private ArrayList<PlateObstacleObject> obstacles;
-	private PImage editTitleImage;
 	private PImage backgroundImage;
 	private Plate plate;
 	private Ball ball;
 	private PlateController plateController;
 	private PlateObstacleType currentPlateObstacleObject;
-	
 
 	// buttons
 	private Button burgerButton;
@@ -44,31 +40,40 @@ class EditController extends Controller implements ButtonListener {
 	public EditController(PApplet parent, PlateController plateController) {
 		super(parent);
 		this.plateController = plateController;
-		
-		// init plate obstacle object
-		obstacles = new ArrayList<PlateObstacleObject>();
+	
 		currentPlateObstacleObject = PlateObstacleType.BURGER;
 		
 		// init buttons
 		float xMargin = 35;
+		int y;
+		int yMargin = 5;
+		y = 250;
 		burgerButton = new Button(p, xMargin ,250, 150, 35,"Burger", this);
-		friesButton = new Button(p, xMargin ,250 + burgerButton.height, 150, 35,"Fries", this);
-		drinkButton = new Button(p, xMargin ,250 + burgerButton.height + friesButton.height, 150, 35,"Drink", this);
-		movingBurgerButton = new Button(p, xMargin , 250 + burgerButton.height + friesButton.height + drinkButton.height, 250, 35, "Moving Burger", this);
-		movingFriesButton = new Button(p, xMargin , 250 + burgerButton.height + friesButton.height + drinkButton.height + movingBurgerButton.height,250, 35,"Moving Fries", this);
-		movingDrinkButton = new Button(p, xMargin,250 + burgerButton.height + friesButton.height + drinkButton.height + movingBurgerButton.height + movingFriesButton.height,250, 35,"Moving Drink", this);
+		y += burgerButton.height + yMargin;
+		friesButton = new Button(p, xMargin ,y, 150, 35,"Fries", this);
+		y += friesButton.height + yMargin;
+		drinkButton = new Button(p, xMargin ,y, 150, 35,"Drink", this);
+		y +=  drinkButton.height + yMargin;
+		movingBurgerButton = new Button(p, xMargin ,  y, 250, 35, "Moving Burger", this);
+		y +=  movingBurgerButton.height + yMargin;
+		movingFriesButton = new Button(p, xMargin ,  y,250, 35,"Moving Fries", this);
+		y +=  movingFriesButton.height + yMargin ;
+		movingDrinkButton = new Button(p, xMargin, y ,250, 35,"Moving Drink", this);
 		clearButton = new Button(p, xMargin,500,250, 35,"CLEAR", this);
 		
 		// buttons
 		backgroundImage = p.loadImage(BACKGROUND_FILE);
-		editTitleImage = p.loadImage(EDIT_TITLE_FILE);
-		cancelButton = new MenuButton(p, 0, p.height * 0.90f, 400, 80, "CANCEL", this);
-		playButton = new MenuButton(p, p.width - 200, p.height * 0.90f, 400, 80, "PLAY!", this);
+		cancelButton = new MenuButton(p, 45, p.height * 0.90f - 25, 400, 80, "MENU", this);
+		playButton = new MenuButton(p, p.width - 210, p.height * 0.90f - 25, 400, 80, "PLAY!", this);
 		
 	}
 	
 	public void init() {
-		plateController.removeAllPlateObstacles();
+		if (plateController.gameMode == GameMode.CLASSIC) {
+			plateController.removeAllPlateObstacles();
+		} else {
+
+		}
 		this.plate = plateController.plate;
 		this.ball = plateController.ball;
 	}
@@ -77,7 +82,7 @@ class EditController extends Controller implements ButtonListener {
 		
 		p.background(0, 0, 0);
 		p.image(backgroundImage, 0, 0, p.width, p.height);
-		p.image(editTitleImage, PApplet.round(p.width/2.0f - editTitleImage.width/2.0f), 0);
+		//p.image(editTitleImage, PApplet.round(p.width/2.0f - editTitleImage.width/2.0f), 0);
 		cancelButton.draw();
 		playButton.draw();
 		
@@ -93,7 +98,7 @@ class EditController extends Controller implements ButtonListener {
 		ball.draw2D();
 
 		//draw all obstacles in 2D
-		for (PlateObstacleObject obstacle : obstacles) {
+		for (PlateObstacleObject obstacle : plateController.obstacleList) {
 			obstacle.draw2D();
 		}
 
@@ -126,7 +131,7 @@ class EditController extends Controller implements ButtonListener {
 			PlateObstacleObject obstacle = plateController.constructPlateObstacleObject(currentPlateObstacleObject); 
 			obstacle.location.x = mouseLocation.x;
 			obstacle.location.z = mouseLocation.z;
-			obstacles.add(obstacle);
+			plateController.obstacleList.add(obstacle);
 		}
 	}
 	
@@ -158,13 +163,13 @@ class EditController extends Controller implements ButtonListener {
 		} else if (button == movingDrinkButton) {
 			currentPlateObstacleObject = PlateObstacleType.MOVING_DRINK;
 		} else if (button == clearButton) {
-			obstacles.removeAll(obstacles);
+			plateController.removeAllPlateObstacles();
 		} else if (button == cancelButton) {
 			MainController.setMode(MainController.MENU_VIEW);
 		} else if (button == playButton) {
 			MainController.setMode(MainController.PLATE_VIEW);
-			PlateController plateController = (PlateController) MainController.getCurrentControler();
-			plateController.loadPlateObstacles(obstacles);
+			//PlateController plateController = (PlateController) MainController.getCurrentControler();
+			//plateController.loadPlateObstacles(obstacles);
 		}
 	}
 	
@@ -187,7 +192,7 @@ class EditController extends Controller implements ButtonListener {
 	}
 
 	private boolean isObstacleClear(PVector mouseLocation) {
-		for (PlateObstacleObject obstacle : obstacles) {
+		for (PlateObstacleObject obstacle : plateController.obstacleList) {
 			PVector distanceBetweenCylinders = PVector.sub(mouseLocation, obstacle.location);      
 			if (obstacle.isCylindric() && distanceBetweenCylinders.mag() < 2.0*Cylinder.CYLINDER_RADIUS ) {
 				return false;

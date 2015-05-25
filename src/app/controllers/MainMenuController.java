@@ -33,9 +33,9 @@ public class MainMenuController extends Controller implements ButtonListener {
 		menuTitleImage = p.loadImage(MENU_TITLE_FILE);
 		burgerSodaFriesImage = p.loadImage(BURGER_SODA_FIRES_FILE);
 		menuRaysImage = p.loadImage(MENU_RAYS_FILE);
-		playButton = new MenuButton(p, 170, p.height * 0.35f, 400, 90, "> PLAY", this);
-		editButton = new MenuButton(p, 170, playButton.y + playButton.height + 40, 400, 90, "> EDIT", this);
-		creditButton = new MenuButton(p, 170, playButton.y + playButton.height + 40 + editButton.height + 40, 400, 90, "> CREDITS", this);
+		playButton = new MenuButton(p, 100, p.height * 0.35f, 400, 90, "> PLAY", this);
+		editButton = new MenuButton(p, 100, playButton.y + playButton.height + 40, 400, 90, "> EDIT", this);
+		creditButton = new MenuButton(p, 100, playButton.y + playButton.height + 40 + editButton.height + 40, 400, 90, "> CREDITS", this);
 	}
 	
 	@Override
@@ -70,6 +70,9 @@ public class MainMenuController extends Controller implements ButtonListener {
 		if (button == playButton) {
 			MainController.setMode(MainController.MODE_VIEW);
 		} else if (button == editButton) {
+			MainController.setMode(MainController.PLATE_VIEW);
+			PlateController plateController = (PlateController) MainController.getCurrentControler();
+			plateController.setGameMode(PlateController.GameMode.CLASSIC); 
 			MainController.setMode(MainController.EDIT_VIEW);
 		}
 	}

@@ -37,7 +37,7 @@ public class ImageProcessingSolver extends Parent {
 		lowerBoundSat = 52;
 		upperBoundSat = 255;
 		lowerBoundBright = 12;
-		upperBoundBright = 149;*/
+		upperBoundBright = 149;
 
 		//threshold for 1/2/3/4.png
 		/*lowerBoundHue = 64;
@@ -46,21 +46,15 @@ public class ImageProcessingSolver extends Parent {
 		upperBoundSat = 255;
 		lowerBoundBright = 46;
 		upperBoundBright = 150;*/
-
-		//threshold for interaction mode - to tune each time
-		/*lowerBoundHue = 59;
-		upperBoundHue = 106;
-		lowerBoundSat = 78;
-		upperBoundSat =231;
-		lowerBoundBright = 19;
-		upperBoundBright = 162;*/
 		
-		lowerBoundHue = 79;
-		upperBoundHue = 128;
-		lowerBoundSat = 50;
-		upperBoundSat = 255;
-		lowerBoundBright = 49;
-		upperBoundBright = 247;
+		lowerBoundHue = 56;
+		upperBoundHue = 139;
+		lowerBoundSat = 87;
+		upperBoundSat =255;
+		lowerBoundBright = 81;
+		upperBoundBright = 255;
+
+	
 
 	}
 
@@ -74,18 +68,25 @@ public class ImageProcessingSolver extends Parent {
 
 	public PImage colorThresholding(PImage img) {
 		img.loadPixels();
-		PImage result = p.createImage(img.width, img.height, PApplet.RGB);
+		PImage result = p.createImage(img.width, img.height, PApplet.ALPHA);
 
 		for (int i = 0; i < img.width * img.height; i++) {
+
+			//precompute the values before testing the condition
 			int c = p.color(img.pixels[i]);
-			if (p.hue(c) >= lowerBoundHue && p.hue(c) <= upperBoundHue &&
-					p.saturation(c) >= lowerBoundSat && p.saturation(c) <= upperBoundSat &&
-					p.brightness(c) >= lowerBoundBright && p.brightness(c) <= upperBoundBright) {
+			float sat = p.saturation(c);
+			float hue = p.hue(c);
+			float bright = p.brightness(c);
+
+			if (hue >= lowerBoundHue && hue <= upperBoundHue &&
+					sat >= lowerBoundSat && sat <= upperBoundSat &&
+					bright >= lowerBoundBright && bright <= upperBoundBright) {
 				result.pixels[i] = p.color(255);
 			} else {
 				result.pixels[i] = p.color(0);
 			}
 		}
+
 		result.updatePixels();
 		return result;
 	}
@@ -93,32 +94,41 @@ public class ImageProcessingSolver extends Parent {
 	public PImage convolute(PImage img, float[][] kernel, float weight) {
 
 		img.loadPixels();
-		PImage result = p.createImage(img.width, img.height, PApplet.RGB);
-
+		PImage result = p.createImage(img.width, img.height, PApplet.ALPHA);
 		float sum = 0.f;
-
-		for (int i = 0; i < img.width*img.height; i++) {
-			result.pixels[i] = p.color(0);
-		}
 
 		for (int y = 1; y < img.height-1; y++) { //rows of the images
 			for (int x = 1; x < img.width-1; x++) { //columns of the images
 
-				sum = 
-						p.brightness(img.pixels[(y*img.width+x)-img.width - 1])*kernel[0][0] +
-						p.brightness(img.pixels[(y*img.width+x)-img.width    ])*kernel[0][1] +
-						p.brightness(img.pixels[(y*img.width+x)-img.width + 1])*kernel[0][2] +
-						p.brightness(img.pixels[(y*img.width+x)           - 1])*kernel[1][0] +
-						p.brightness(img.pixels[(y*img.width+x)              ])*kernel[1][1] +
-						p.brightness(img.pixels[(y*img.width+x)           + 1])*kernel[1][2] +
-						p.brightness(img.pixels[(y*img.width+x)+img.width - 1])*kernel[2][0] +
-						p.brightness(img.pixels[(y*img.width+x)+img.width    ])*kernel[2][1] +
-						p.brightness(img.pixels[(y*img.width+x)+img.width + 1])*kernel[2][2];
+				//precompute the current value
+				int current = (y*img.width+x);
 
-				result.pixels[y*img.width+x] = p.color(sum/weight);
+				//avoid the kernel array search
+				/*sum = 
+						p.brightness(img.pixels[current-img.width - 1])*kernel[0][0] +
+						p.brightness(img.pixels[current-img.width    ])*kernel[0][1] +
+						p.brightness(img.pixels[current-img.width + 1])*kernel[0][2] +
+						p.brightness(img.pixels[current           - 1])*kernel[1][0] +
+						p.brightness(img.pixels[current              ])*kernel[1][1] +
+						p.brightness(img.pixels[current           + 1])*kernel[1][2] +
+						p.brightness(img.pixels[current+img.width - 1])*kernel[2][0] +
+						p.brightness(img.pixels[current+img.width    ])*kernel[2][1] +
+						p.brightness(img.pixels[current+img.width + 1])*kernel[2][2];*/
+
+				sum = 
+						p.brightness(img.pixels[current-img.width - 1])*9 +
+						p.brightness(img.pixels[current-img.width    ])*12 +
+						p.brightness(img.pixels[current-img.width + 1])*9 +
+						p.brightness(img.pixels[current           - 1])*12 +
+						p.brightness(img.pixels[current              ])*15 +
+						p.brightness(img.pixels[current           + 1])*12 +
+						p.brightness(img.pixels[current+img.width - 1])*9 +
+						p.brightness(img.pixels[current+img.width    ])*12 +
+						p.brightness(img.pixels[current+img.width + 1])*9;
+
+				result.pixels[current] = p.color(sum/weight);			
 			}
 		}
-
 		result.updatePixels();
 		return result;
 	}
@@ -126,14 +136,14 @@ public class ImageProcessingSolver extends Parent {
 
 	public PImage intensityThresholding(PImage img, float threshold) {
 		img.loadPixels();
-		PImage result = p.createImage(img.width, img.height, PApplet.RGB);
+		PImage result = p.createImage(img.width, img.height, PApplet.ALPHA);
 
 		for (int i = 0; i < img.width * img.height; i++) {
 			int c = p.color(img.pixels[i]);
 			if (p.brightness(c) > threshold) {
-				result.pixels[i] = p.color (255, 255, 255);
+				result.pixels[i] = p.color (255);
 			} else {
-				result.pixels[i] = p.color (0, 0, 0);
+				result.pixels[i] = p.color (0);
 			}
 		}
 		result.updatePixels();
@@ -143,13 +153,13 @@ public class ImageProcessingSolver extends Parent {
 	public PImage sobel(PImage img) {
 
 		img.loadPixels();
-		PImage result = p.createImage(img.width, img.height, PApplet.RGB);
+		PImage result = p.createImage(img.width, img.height, PApplet.ALPHA);
 
 		float sum_h = 0.f;
 		float sum_v = 0.f;
 		float sum = 0.f;
 
-		float[][] hkernel = { 
+		/*float[][] hkernel = { 
 				{
 					0, 1, 0
 				}
@@ -176,60 +186,56 @@ public class ImageProcessingSolver extends Parent {
 				{
 					0, 0, 0
 				}
-		};
+		};*/
 
-		for (int i = 0; i < img.width*img.height; i++) {
+		/*for (int i = 0; i < img.width*img.height; i++) {
 			result.pixels[i] = p.color(0);
-		}
-
-		float max = 0;
-		float [] buffer = new float [img.width * img.height];
+		}*/
 
 		//for each pixels
 		for (int y = 1; y < img.height-1; y++) { //rows of the images
 			for (int x = 1; x < img.width-1; x++) { //columns of the images
-
-				sum_v = 
-						p.brightness(img.pixels[(y*img.width+x)-img.width - 1])*vkernel[0][0] +
-						p.brightness(img.pixels[(y*img.width+x)-img.width    ])*vkernel[0][1] +
-						p.brightness(img.pixels[(y*img.width+x)-img.width + 1])*vkernel[0][2] +
-						p.brightness(img.pixels[(y*img.width+x)           - 1])*vkernel[1][0] +
-						p.brightness(img.pixels[(y*img.width+x)              ])*vkernel[1][1] +
-						p.brightness(img.pixels[(y*img.width+x)           + 1])*vkernel[1][2] +
-						p.brightness(img.pixels[(y*img.width+x)+img.width - 1])*vkernel[2][0] +
-						p.brightness(img.pixels[(y*img.width+x)+img.width    ])*vkernel[2][1] +
-						p.brightness(img.pixels[(y*img.width+x)+img.width + 1])*vkernel[2][2];
+				int current = (y*img.width+x);
+				/*sum_v = 
+						p.brightness(img.pixels[current-img.width - 1])*vkernel[0][0] +
+						p.brightness(img.pixels[current-img.width    ])*vkernel[0][1] +
+						p.brightness(img.pixels[current-img.width + 1])*vkernel[0][2] +
+						p.brightness(img.pixels[current          - 1])*vkernel[1][0] +
+						p.brightness(img.pixels[current              ])*vkernel[1][1] +
+						p.brightness(img.pixels[current           + 1])*vkernel[1][2] +
+						p.brightness(img.pixels[current+img.width - 1])*vkernel[2][0] +
+						p.brightness(img.pixels[current+img.width    ])*vkernel[2][1] +
+						p.brightness(img.pixels[current+img.width + 1])*vkernel[2][2];
 
 				sum_h = 
-						p.brightness(img.pixels[(y*img.width+x)-img.width - 1])*hkernel[0][0] +
-						p.brightness(img.pixels[(y*img.width+x)-img.width    ])*hkernel[0][1] +
-						p.brightness(img.pixels[(y*img.width+x)-img.width + 1])*hkernel[0][2] +
-						p.brightness(img.pixels[(y*img.width+x)           - 1])*hkernel[1][0] +
-						p.brightness(img.pixels[(y*img.width+x)              ])*hkernel[1][1] +
-						p.brightness(img.pixels[(y*img.width+x)           + 1])*hkernel[1][2] +
-						p.brightness(img.pixels[(y*img.width+x)+img.width - 1])*hkernel[2][0] +
-						p.brightness(img.pixels[(y*img.width+x)+img.width    ])*hkernel[2][1] +
-						p.brightness(img.pixels[(y*img.width+x)+img.width + 1])*hkernel[2][2];
+						p.brightness(img.pixels[current-img.width - 1])*hkernel[0][0] +
+						p.brightness(img.pixels[current-img.width    ])*hkernel[0][1] +
+						p.brightness(img.pixels[current-img.width + 1])*hkernel[0][2] +
+						p.brightness(img.pixels[current          - 1])*hkernel[1][0] +
+						p.brightness(img.pixels[current              ])*hkernel[1][1] +
+						p.brightness(img.pixels[current           + 1])*hkernel[1][2] +
+						p.brightness(img.pixels[current+img.width - 1])*hkernel[2][0] +
+						p.brightness(img.pixels[current+img.width    ])*hkernel[2][1] +
+						p.brightness(img.pixels[current+img.width + 1])*hkernel[2][2];*/
+
+				sum_v = 
+						p.brightness(img.pixels[current          - 1]) -		
+						p.brightness(img.pixels[current           + 1]);
+
+				sum_h = 	
+						p.brightness(img.pixels[current-img.width    ]) -
+						p.brightness(img.pixels[current+img.width    ]);
 
 				sum = PApplet.sqrt(PApplet.pow(sum_h, 2) + PApplet.pow(sum_v, 2));
-				if (sum > max) {
-					max = sum;
-				}
-				buffer[y*img.width+x] = sum;
-			}
-		}
 
-		for (int y = 1; y < img.height-1; y++) { //rows of the images
-			for (int x = 1; x < img.width-1; x++) { //columns of the images
-
-				if (buffer[y*img.width+x] > (int)(max*0.3f)) {
-					result.pixels[y*img.width+x] = p.color(255);
+				//directly save the value in result (as the max value is always around 360, don't need to do a second loop)
+				if (sum > (int)(360*0.3f)) {
+					result.pixels[(y*img.width+x)] = p.color(255);
 				} else {
-					result.pixels[y*img.width+x] = p.color(0);
+					result.pixels[(y*img.width+x)] = p.color(0);
 				}
 			}
 		}
-
 		result.updatePixels();  
 		return result;
 	}
@@ -237,16 +243,31 @@ public class ImageProcessingSolver extends Parent {
 	public PImage pipelineToSobel(PImage img) {
 
 		//Detect the board with color thresholding
+		long startTime1 = System.currentTimeMillis();	
 		PImage boardHSV = colorThresholding(img); 
+		long estimatedTime1 = System.currentTimeMillis() - startTime1;
+		//System.err.println("Time for colorThresholding = " + estimatedTime1);
 
 		//Apply gaussian filter three times to blur the image
-		PImage boardBlur = convolute(convolute(convolute(boardHSV, gaussian, 99), gaussian, 99), gaussian, 99);
+		long startTime2 = System.currentTimeMillis();	
+		PImage boardBlur = convolute(boardHSV, gaussian, 99);
+		long estimatedTime2 = System.currentTimeMillis() - startTime2;
+		//System.err.println("Time to convolute = " + estimatedTime2);
 
 		//Apply Intensity thresholding
-		PImage boardIntensity = intensityThresholding(boardBlur, 200);
+		long startTime3 = System.currentTimeMillis();	
+		//PImage boardIntensity = intensityThresholding(boardBlur, 200);
+		long estimatedTime3 = System.currentTimeMillis() - startTime3;
+		//System.err.println("Time for intensityThresholding = " + estimatedTime3);
 
 		//Apply sobel algorithm to detect the edges
-		PImage boardEdges = sobel(boardIntensity);
+		long startTime4 = System.currentTimeMillis();	
+		//PImage boardEdges = sobel(boardIntensity);
+		PImage boardEdges = sobel(boardBlur);
+
+		long estimatedTime4 = System.currentTimeMillis() - startTime4;
+		//System.err.println("Time to sobel = " + estimatedTime4);
+
 		return boardEdges;
 	}
 

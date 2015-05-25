@@ -75,7 +75,7 @@ public class MovingCylinder extends Cylinder {
 			ballDeltaLocation.setMag((ball.radius + radius) - distanceBetweenCenters.mag());
 			ball.location.add(ballDeltaLocation);
 		
-			plateController.addPoints(PApplet.round(ball.velocity.mag()));
+			plateController.addPoints(PApplet.round(ball.velocity.mag()), this);
 
 			// user win some points proportioned to the velocity of the ball
 			if (ball.velocity.mag() >= MIN_VELOCITY_COLLISION && PApplet.round(PVector.angleBetween(ball.velocity, this.velocity)) != 0.0) {

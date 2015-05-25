@@ -11,7 +11,7 @@ import java.util.*;
 
 public class DetectionSolver extends Parent{
 
-	public static float scale = 0.7f;
+	public static float scale = 0.5f;
 
 	//variable for lines detections
 	private float discretizationStepsPhi; 
@@ -44,23 +44,22 @@ public class DetectionSolver extends Parent{
 	}
 
 	public List<PVector> solve(PImage img) {
-
 		//Apply hough algorithm to select lines
-		PApplet.println("******************************************************************************************************************************");
+		//System.out.println("******************************************************************************************************************************");
 		detectedLines = hough(img);
 
 		//Get the corners coordinates of the board
 		if (detectedLines.size() < 4) {
 			System.err.println("There is not enough detected lines");
 		} else {
-			PApplet.println("******************************************************************************************************************************");
+			//System.out.println("******************************************************************************************************************************");
 			graph.build(detectedLines, img.width, img.height);
 			graph.findCycles();
 			filterQuads();
 			if(validQuad.size() < 1 ) {
 				System.err.println("There is no quad detected");
 			} else {
-				PApplet.println("******************************************************************************************************************************");
+				//System.out.println("******************************************************************************************************************************");
 				for (int i = 0; i < validQuad.size(); i ++) {
 					quadsCoordinates.set(i,sortCorners(quadsCoordinates.get(i)));
 				}
@@ -71,17 +70,17 @@ public class DetectionSolver extends Parent{
 	}
 
 	public void selectTheBestQuad() {
-		
+
 		PVector c0;
 		PVector c1;
 		PVector c2;
 		PVector c3;
 		PVector diag1;
 		PVector diag2;
-		
+
 		int best = 0;
 		float minDist = 10000000;
-		
+
 		for (int i = 0; i < validQuad.size(); i ++) {
 			c0 = (quadsCoordinates.get(i)).get(0);
 			c1 = (quadsCoordinates.get(i)).get(1);
@@ -95,13 +94,13 @@ public class DetectionSolver extends Parent{
 				minDist = Math.abs(diag1.mag() - diag2.mag());
 			}
 		}
-		
+
 		fourCorners.add((quadsCoordinates.get(best)).get(0));
 		fourCorners.add((quadsCoordinates.get(best)).get(1));
 		fourCorners.add((quadsCoordinates.get(best)).get(2));
 		fourCorners.add((quadsCoordinates.get(best)).get(3));
-		PApplet.println("Board at " + Arrays.toString(fourCorners.toArray()));
-		
+		System.out.println("Final board at " + Arrays.toString(fourCorners.toArray()));
+
 		resultImage.beginDraw();
 		resultImage.fill(255, 0, 0);
 		resultImage.ellipse(fourCorners.get(0).x*scale, fourCorners.get(0).y*scale, 8,8);
@@ -110,7 +109,7 @@ public class DetectionSolver extends Parent{
 		resultImage.ellipse(fourCorners.get(3).x*scale, fourCorners.get(3).y*scale, 8,8);
 		resultImage.endDraw();
 	}
-	
+
 	public List<PVector> hough(PImage edgeImg) {
 
 		//Variable for the computation
@@ -154,7 +153,7 @@ public class DetectionSolver extends Parent{
 			}
 		}
 
-		PApplet.println("There are " + numberOfLinesDetected + " lines detected with minVotes = " + minVotes + ".");
+		System.out.println("There are " + numberOfLinesDetected + " lines detected with minVotes = " + minVotes + ".");
 
 		//Store the minVotes best lines
 		for (int idx = 0; idx < accumulator.length; idx++) { 
@@ -188,17 +187,17 @@ public class DetectionSolver extends Parent{
 			}
 		}
 
-		PApplet.println("Only " + bestCandidates.size() + " remind after the local maxima selection.");
+		//System.out.println("Only " + bestCandidates.size() + " remind after the local maxima selection.");
 
 		//Sort the best lines
 		Collections.sort(bestCandidates, new HoughComparator(accumulator));
-		PApplet.println("Sort the " + bestCandidates.size() + " candidates ...");
+		//System.out.println("Sort the " + bestCandidates.size() + " candidates ...");
 
 
 		//Check on the array size to avoid out-of-bound issue
 		if (bestCandidates.size() < nLines) {
 			nLines = bestCandidates.size();
-			PApplet.println("Draw the "+ nLines + " best lines ...");
+			System.out.println("Draw the "+ nLines + " best lines ...");
 
 		}
 		int bound = 0;
@@ -209,7 +208,7 @@ public class DetectionSolver extends Parent{
 		//Draw the lines
 		for (int i = 0; i < bound; i++) {
 			int idx = bestCandidates.get(i);
-			PApplet.println("- Line " + (i+1) + " is drawn. It has " + accumulator[idx] + " votes");
+			//System.out.println("- Line " + (i+1) + " is drawn. It has " + accumulator[idx] + " votes");
 
 			//Compute back the (r, phi) polar coordinates:
 			accPhi = (int) (idx / (rDim + 2)) - 1;
@@ -232,7 +231,7 @@ public class DetectionSolver extends Parent{
 			int x3 = (int) (-(y3 - r / sinPhi) * (sinPhi / cosPhi));
 
 			//Plot the lines
-			resultImage.beginDraw();
+			/*resultImage.beginDraw();
 			resultImage.stroke(204, 102, 0); 
 			if (y0 > 0) {
 				if (x1 > 0)
@@ -250,7 +249,7 @@ public class DetectionSolver extends Parent{
 				} else
 					resultImage.line(x2*scale, y2*scale, x3*scale, y3*scale);
 			}
-			resultImage.endDraw();
+			resultImage.endDraw();*/
 		}
 
 		return detectedLines;
@@ -271,26 +270,26 @@ public class DetectionSolver extends Parent{
 
 			//test if the quad is convex, has reasonable size and is rectangular 
 			if (graph.isConvex(c12, c23, c34, c41)) {
-				if (graph.validArea(c12, c23, c34, c41, 600000, 60000) &&
+				if (graph.validArea(c12, c23, c34, c41, 600000, 40000) &&
 						graph.isFlat(c12, c23, c34, c41)) {
-					
+
 					//add the quad to the valid quad list
 					validQuad.add(quad);
-					
+
 					//draw the quad
-					resultImage.beginDraw();
+					/*resultImage.beginDraw();
 					Random random = new Random(); 
 					resultImage.fill(p.color(PApplet.min(255, random.nextInt(300)), 
 							PApplet.min(255, random.nextInt(300)), 
 							PApplet.min(255, random.nextInt(300)), 50));
-					resultImage.quad(c12.x*scale, c12.y*scale, c23.x*scale, c23.y*scale, c34.x*scale, c34.y*scale, c41.x*scale, c41.y*scale);
+					resultImage.quad(c12.x*scale, c12.y*scale, c23.x*scale, c23.y*scale, c34.x*scale, c34.y*scale, c41.x*scale, c41.y*scale);*/
 
 					//add the coordinates of the current quad
 					quadsCoordinates.add(idx,Arrays.asList(c12,c23,c34,c41));
 					idx++;
-					
+
 					// draw the corners
-					resultImage.fill(255, 128, 0);
+					/*resultImage.fill(255, 128, 0);
 					resultImage.text("(" + c12.x + "," + c12.y + ")", c12.x*scale,c12.y*scale);
 					resultImage.ellipse(c12.x*scale, c12.y*scale, 5,5);
 					resultImage.text("(" + c23.x + "," + c23.y + ")", c23.x*scale,c23.y*scale);
@@ -299,65 +298,62 @@ public class DetectionSolver extends Parent{
 					resultImage.ellipse(c34.x*scale, c34.y*scale, 5,5);
 					resultImage.text("(" + c41.x + "," + c41.y + ")", c41.x*scale,c41.y*scale);
 					resultImage.ellipse(c41.x*scale, c41.y*scale, 5,5);
-					
-					resultImage.endDraw();
+
+					resultImage.endDraw();*/
 				}
 			}
 		}
-		PApplet.println("At the end of the quad selection, there are " + validQuad.size() + " quad(s) that are valid.");
-		PApplet.println("At the end of the quad selection, there are " + quadsCoordinates.size() + " quad(s) that are valid.");
+		System.out.println("At the end of the quad selection, there are " + validQuad.size() + " quad(s) that are valid.");
 
 	}
 
-public List<PVector> sortCorners(List<PVector> quad) {
-	// Sort corners so that they are ordered clockwise
-	PVector a = quad.get(0);
-	PVector b = quad.get(2);
-	PApplet.println("---");
+	public List<PVector> sortCorners(List<PVector> quad) {
+		// Sort corners so that they are ordered clockwise
+		PVector a = quad.get(0);
+		PVector b = quad.get(2);
 
-	PVector center = new PVector((a.x+b.x)/2,(a.y+b.y)/2);
-	Collections.sort(quad,new CWComparator(center));
-	PApplet.println("Sorting the coordinates clockwise...");
-	PApplet.println("Board at 0(" + quad.get(0).x + "," +  quad.get(0).y + ") / 1(" + quad.get(1).x + "," +  quad.get(1).y + ") / 2(" + quad.get(2).x + "," +  quad.get(2).y + ") / 3(" + quad.get(3).x + "," +  quad.get(3).y + ")");
+		PVector center = new PVector((a.x+b.x)/2,(a.y+b.y)/2);
+		Collections.sort(quad,new CWComparator(center));
+		System.out.println("Sorting the coordinates clockwise...");
 
-	// Re-order the corners so that the first one is the closest to the
-	// origin (0,0) of the image.
+		// Re-order the corners so that the first one is the closest to the
+		// origin (0,0) of the image.
 
-	float minDistance = 100000;
-	float distanceToOrigin; 
-	int idx = 0;
+		float minDistance = 100000;
+		float distanceToOrigin; 
+		int idx = 0;
 
-	for (int i = 0; i < 4; i++) {
-		PVector dist = PVector.sub(quad.get(i),new PVector(0,0));
-		distanceToOrigin = dist.mag();
-		PApplet.println("Distance between center and corner " + i + ": " + distanceToOrigin);
-		if(distanceToOrigin < minDistance) {
-			minDistance = distanceToOrigin;
-			idx = i;
+		for (int i = 0; i < 4; i++) {
+			PVector dist = PVector.sub(quad.get(i),new PVector(0,0));
+			distanceToOrigin = dist.mag();
+			System.out.println("Distance between center and corner " + i + ": " + distanceToOrigin);
+			if(distanceToOrigin < minDistance) {
+				minDistance = distanceToOrigin;
+				idx = i;
+			}
 		}
+
+		Collections.rotate(quad,idx);
+		System.out.println("Sorting the coordinates with closest to origin");
+		System.out.println("Board at 0(" + quad.get(0).x + "," +  quad.get(0).y + ") / 1(" + quad.get(1).x + "," +  quad.get(1).y + ") / 2(" + quad.get(2).x + "," +  quad.get(2).y + ") / 3(" + quad.get(3).x + "," +  quad.get(3).y + ")");
+		return quad; 
 	}
 
-	Collections.rotate(quad,idx);
-	PApplet.println("Sorting the coordinates with closest to origin");
-	PApplet.println("Board at 0(" + quad.get(0).x + "," +  quad.get(0).y + ") / 1(" + quad.get(1).x + "," +  quad.get(1).y + ") / 2(" + quad.get(2).x + "," +  quad.get(2).y + ") / 3(" + quad.get(3).x + "," +  quad.get(3).y + ")");
-	return quad; 
-}
+	//General methods which returns the (x,y) coordinates of the intersection between two lines
+	public PVector intersection(PVector line1, PVector line2) {
+		double sin_t1 = Math.sin(line1.y);
+		double sin_t2 = Math.sin(line2.y);
+		double cos_t1 = Math.cos(line1.y);
+		double cos_t2 = Math.cos(line2.y);
+		float r1 = line1.x;
+		float r2 = line2.x;
 
-//General methods which returns the (x,y) coordinates of the intersection between two lines
-public PVector intersection(PVector line1, PVector line2) {
-	double sin_t1 = Math.sin(line1.y);
-	double sin_t2 = Math.sin(line2.y);
-	double cos_t1 = Math.cos(line1.y);
-	double cos_t2 = Math.cos(line2.y);
-	float r1 = line1.x;
-	float r2 = line2.x;
+		double denom = cos_t2 * sin_t1 - cos_t1 * sin_t2;
 
-	double denom = cos_t2 * sin_t1 - cos_t1 * sin_t2;
-
-	int x = (int) ((r2 * sin_t1 - r1 * sin_t2) / denom);
-	int y = (int) ((-r2 * cos_t1 + r1 * cos_t2) / denom);
-	return (new PVector(x, y));
-}
+		int x = (int) ((r2 * sin_t1 - r1 * sin_t2) / denom);
+		int y = (int) ((-r2 * cos_t1 + r1 * cos_t2) / denom);
+		return (new PVector(x, y));
+	}
 
 
 }

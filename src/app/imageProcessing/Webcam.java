@@ -16,10 +16,10 @@ import processing.video.Capture;
 public class Webcam extends Parent{
 
 	private static final String BOARD_IMAGE= "1.png"; 
-	private final static boolean INTERACTION_MODE = false;
-	public final static int PROCESS_EACH_X_FRAME = 30;
-	
-	public static float scale = 0.7f;
+	private final static boolean INTERACTION_MODE = true;
+	public final static int PROCESS_EACH_X_FRAME = 1;
+
+	public static float scale = 0.5f;
 
 	private PImage currentImg;
 	private ImageProcessingSolver processing;
@@ -29,94 +29,81 @@ public class Webcam extends Parent{
 	private PImage imageProcessed;
 	private List<PVector> intersections; 
 	private PVector rotationAngles;
-	
+
 	private Capture cam;
 	private PGraphics resultImage;
 
-	private boolean doStepOneOnlyOnce = false;
-	
 	public Webcam(PApplet parent) {
 		super(parent);
-		
+
 		currentImg = p.loadImage(BOARD_IMAGE);
-		
+
 		if (INTERACTION_MODE) {
 			String[] cameras = Capture.list(); 
 			cam = new Capture(parent, cameras[3]); 
 			cam.start();
 		} 
 		rotationAngles = new PVector();
-		resultImage = p.createGraphics((int)(MainController.WINDOW_WIDTH * scale), (int)(MainController.WINDOW_HEIGHT * scale),PApplet.P2D);
-
+		resultImage = p.createGraphics((int)(scale*currentImg.width), (int)(scale*currentImg.height),PApplet.P2D);
 
 	}
-	
+
 	public void update() {
-		
+
 		if (INTERACTION_MODE) {
 			if (cam.available()) {
 				cam.read();
 			}
 			currentImg = cam.get();
 		} 
-		
+
 		if (p.frameCount % PROCESS_EACH_X_FRAME == 0) { 
-			
-			long globalStartTime = System.currentTimeMillis();
-			
 			//initialize the solvers
 			processing = new ImageProcessingSolver(p);
-
 			detection = new DetectionSolver(p, resultImage);
 			converter = new TwoDThreeD((int)(MainController.WINDOW_WIDTH*scale),(int)(MainController.WINDOW_HEIGHT*scale));
-				
+		
+			//System.out.println("******************************************************************************************************************************");
+			long startTime = System.currentTimeMillis();	
 			// 1st step
-			long startTime = System.currentTimeMillis();
-			//if (!doStepOneOnlyOnce) {
-				//doStepOneOnlyOnce = true;
-				imageProcessed =  processing.solve(currentImg);
-			//}
-
+			imageProcessed =  processing.solve(currentImg);
 			long estimatedTime = System.currentTimeMillis() - startTime;
-			if (estimatedTime > 200) System.err.println("\n FIRST STEP [MS] = " + estimatedTime);
+			System.err.println("Time to image processing = " + estimatedTime);
+
 			
+
 			// 2nd step
-			//Get the (x,y) coordinates of the corners after the detection algorithms
-			startTime = System.currentTimeMillis();
+			//Get the (x,y) coordinates of the corners after the detection algorithms	
+			long startTime2 = System.currentTimeMillis();	
 			intersections = detection.solve(imageProcessed);
-			estimatedTime = System.currentTimeMillis() - startTime;
-			if (estimatedTime > 200) System.err.println("\n SECOND STEP [MS] = " + estimatedTime);
-			
+			long estimatedTime2 = System.currentTimeMillis() - startTime2;
+			System.err.println("Time to detection = " + estimatedTime2);
+
 			// 3th step
 			if (intersections!= null && intersections.size() >= 4) {
-				startTime = System.currentTimeMillis();
 				rotationAngles = converter.get3DRotations(intersections);	
-				estimatedTime = System.currentTimeMillis() - startTime;
-				if (estimatedTime > 200) System.err.println("\n THIRD STEP [MS] = " + estimatedTime);
 			}
-			
-			estimatedTime = System.currentTimeMillis() - globalStartTime;
-			if (estimatedTime > 200) System.err.println("TOTAL TIME IN [MS] = " + estimatedTime);
+		
 		}
-		
+
 	}
-	
+
 	public void draw() {
-		
-		p.image(currentImg, 0,0, 200, 150);
-		if (imageProcessed != null) p.image(imageProcessed, 0,200, 200, 150);
+
+		p.image(currentImg, 0,500,(int)(scale*currentImg.width), (int)(scale*currentImg.height));
+		if (imageProcessed != null) p.image(imageProcessed, 0,500, (int)(scale*currentImg.width), (int)(scale*currentImg.height));
 		if (intersections != null) {
 			if (intersections.size() >= 4) {
-				p.image(resultImage, 0,400, 570, 400);
+				p.image(resultImage, 0,500, (int)(scale*currentImg.width), (int)(scale*currentImg.height));
 			}
 		}
-	
-		
+
+
 	}
-	
+
 	public PVector getAngles() {
 		return rotationAngles;
 	}
-	
-	
+
+
 }

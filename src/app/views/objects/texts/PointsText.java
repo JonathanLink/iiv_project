@@ -10,9 +10,18 @@ public class PointsText extends AnimatedTextPlate {
 
 	private float relativeMaxY = 0.0f;
 	private float alphaFont = 255.0f;
+	private float ySpeed = -1;
 
 	public PointsText(PApplet parent, PlateController plateController, String text, float x, float y, float z) {
 		super(parent, plateController, text, x, y, z);
+		this.ySpeed = Y_SPEED;
+	}
+	
+	public PointsText(PApplet parent, PlateController plateController, String text, float x, float y, float z, float fontSize, int fontColor, float ySpeed) {
+		this(parent, plateController, text, x, y, z);
+		this.fontSize = fontSize;
+		this.fontFillColor = fontColor;
+		this.ySpeed = ySpeed;
 	}
 
 	public boolean isAnimationFinished() {
@@ -29,8 +38,8 @@ public class PointsText extends AnimatedTextPlate {
 	protected void updateObject() {
 		super.updateObject();
 		if (!isAnimationFinished()) {
-			location.y = location.y - Y_SPEED;
-			relativeMaxY = relativeMaxY + Y_SPEED;
+			location.y = location.y - ySpeed;
+			relativeMaxY = relativeMaxY + ySpeed;
 			float red = fontFillColor >> 16 & 0xFF; // faster than fontFillColor.red() (optimization purpose)
 			float green = fontFillColor >> 8 & 0xFF;
 			float blue = fontFillColor >> 0xFF;

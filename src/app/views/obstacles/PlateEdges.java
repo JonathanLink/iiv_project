@@ -69,7 +69,7 @@ public class PlateEdges extends PlateObstacleObject {
 			float velocity = PApplet.ceil(ball.velocity.mag());
 			if (velocity > 0) {
 				lostPointsText(velocity, ball.location.x, ball.location.z);
-				plateController.addPoints(velocity * -1);
+				plateController.addPoints(velocity * -1, this);
 			}
 			lastTimePointEarned = currentTime;
 		}	
@@ -77,7 +77,7 @@ public class PlateEdges extends PlateObstacleObject {
 	}
 	
 	private void lostPointsText(float velocity, float x, float z) {
-		plateController.addPoints(PApplet.round(velocity));
+		plateController.addPoints(PApplet.round(velocity) * -1, this);
 		String text = "-"+ PApplet.round(velocity) * 100 +" kCal";
 		PointsText pointsText = new PointsText(p, plateController, text, x, -plateController.plate.height , z);
 		pointsText.fontSize = 70;

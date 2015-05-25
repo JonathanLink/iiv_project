@@ -1,6 +1,5 @@
 package app.imageProcessing.solver;
 
-
 import papaya.*;
 import processing.core.*;
 import java.util.*;
@@ -63,6 +62,11 @@ public class TwoDThreeD {
 				{firstColumn[1], secondColumn[1], thirdColumn[1]},
 				{firstColumn[2], secondColumn[2], thirdColumn[2]}
 		};	
+		
+		/*System.out.println("First column: " + Arrays.toString(firstColumn));
+		System.out.println("Second column: " + Arrays.toString(secondColumn));
+		System.out.println("Third" + Arrays.toString(thirdColumn));*/
+
 		
 		// 3 - Computes and returns Euler angles (rx, ry, rz) from this matrix
 		return rotationFromMatrix(rotationMatrix);
@@ -136,6 +140,7 @@ public class TwoDThreeD {
 			A[i*3+2][7]=0;
 			A[i*3+2][8]=0;
 		}
+	
 
 		SVD svd=new SVD(A);
 
@@ -156,7 +161,7 @@ public class TwoDThreeD {
 
 		// Assuming rotation order is around x,y,z
 		PVector rot = new PVector();
-
+	
 		if(mat[1][0] > 0.998) { // singularity at north pole
 			rot.z = 0;
 			float delta = (float) Math.atan2(mat[0][1],mat[0][2]);
@@ -177,16 +182,10 @@ public class TwoDThreeD {
 		rot.x = (float)Math.atan2(mat[2][1]/Math.cos(rot.y), mat[2][2]/Math.cos(rot.y));
 		rot.z = (float)Math.atan2(mat[1][0]/Math.cos(rot.y), mat[0][0]/Math.cos(rot.y));
 		
-		PApplet.println("******************************************************************************************************************************");
-		PApplet.println("Get the rotation angle in degree ...");
-		PApplet.println("rot.x: " + (180*rot.x)/Math.PI);
-		PApplet.println("rot.y: " + (180*rot.y)/Math.PI);
-		PApplet.println("rot.z: " + (180*rot.z)/Math.PI);
 		
-		rot.x = (float) ((180*rot.x)/Math.PI);
 		rot.y = (float) ((180*rot.y)/Math.PI);
+		rot.x = (float) ((180*rot.x)/Math.PI);
 		rot.z = (float) ((180*rot.z)/Math.PI);
-		
 		
 		return rot;
 	}

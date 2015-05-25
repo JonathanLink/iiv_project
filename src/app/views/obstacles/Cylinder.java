@@ -9,6 +9,7 @@ import processing.core.PGraphics;
 import processing.core.PShape;
 import processing.core.PVector;
 import app.controllers.*;
+import app.controllers.PlateController.GameMode;
 
 public class Cylinder extends PlateObstacleObject {
 
@@ -57,7 +58,12 @@ public class Cylinder extends PlateObstacleObject {
 
 		//test for collisions
 		if (distanceBetweenCenters.mag() < ball.radius + radius ) {
-
+			
+			if (plateController.gameMode == GameMode.EAT_ALL) {
+				addPointsText(ball.velocity.mag());
+				return new PVector(0, 0, 0);
+			}
+			
 			// user win some points proportioned to the velocity of the ball
 			if (ball.velocity.mag() >= MIN_VELOCITY_COLLISION) {
 				Date date = new Date();
@@ -117,7 +123,7 @@ public class Cylinder extends PlateObstacleObject {
 
 
 	protected void addPointsText(float velocity) {
-		plateController.addPoints(PApplet.round(velocity));
+		plateController.addPoints(PApplet.round(velocity), this);
 		String text = "+"+ PApplet.round(velocity) * 100 +" kCal";
 		PointsText pointsText = new PointsText(p, plateController, text, location.x, location.y - height , location.z);
 		pointsText.fontSize = 70;

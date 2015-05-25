@@ -89,14 +89,8 @@ public class MainController extends PApplet {
 		modeController = new ModeController(this);
 		
 		// Set current mode
-		//MainController.setMode(SETTINGS_VIEW);
+		MainController.setMode(SETTINGS_VIEW);
 		
-		// ************** TO DEBUG ***********
-		MainController.webcamEnabled = true;
-		MainController.setMode(PLATE_VIEW);
-		plateController.setGameMode(PlateController.GameMode.EAT_ALL); 
-		// ********************************
-
 	}
 
 	public void draw() {

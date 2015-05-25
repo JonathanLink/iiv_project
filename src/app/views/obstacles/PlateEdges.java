@@ -3,6 +3,7 @@ package app.views.obstacles;
 import java.util.Date;
 
 import app.controllers.PlateController;
+import app.controllers.PlateController.GameMode;
 import app.views.objects.Ball;
 import app.views.objects.texts.PointsText;
 import processing.core.PApplet;
@@ -63,16 +64,18 @@ public class PlateEdges extends PlateObstacleObject {
 	
 	
 	private void losePoints(Ball ball) {
-		Date date = new Date();
-		long currentTime = date.getTime() / 1000; 
-		if (currentTime - lastTimePointEarned >= 0.5) {
-			float velocity = PApplet.ceil(ball.velocity.mag());
-			if (velocity > 0) {
-				lostPointsText(velocity, ball.location.x, ball.location.z);
-				plateController.addPoints(velocity * -1, this);
-			}
-			lastTimePointEarned = currentTime;
-		}	
+		if (plateController.gameMode == GameMode.CLASSIC) {
+			Date date = new Date();
+			long currentTime = date.getTime() / 1000; 
+			if (currentTime - lastTimePointEarned >= 0.5) {
+				float velocity = PApplet.ceil(ball.velocity.mag());
+				if (velocity > 0) {
+					lostPointsText(velocity, ball.location.x, ball.location.z);
+					plateController.addPoints(velocity * -1, this);
+				}
+				lastTimePointEarned = currentTime;
+			}	
+		}
 		
 	}
 	

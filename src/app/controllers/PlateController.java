@@ -19,6 +19,7 @@ import app.views.obstacles.PlateEdges;
 import app.views.obstacles.PlateObstacleObject;
 import app.views.obstacles.PlateObstacleType;
 import processing.core.PApplet;
+import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PVector;
 import processing.event.MouseEvent;
@@ -30,7 +31,7 @@ public class PlateController extends Controller implements AnimatedTextListener{
 	}
 	
 	public static final boolean START_COUNTER = true;
-	public static final int COUNTDOWN = 30;  // sec
+	public static final int COUNTDOWN = 60;  // sec
 	public Plate plate;
 	public Ball ball;
 	public ArrayList<PlateObstacleObject> obstacleList;
@@ -44,7 +45,7 @@ public class PlateController extends Controller implements AnimatedTextListener{
 	private static final float GRAVITY_CONST_MOUSE = 0.05f;  
 	private static final float FRICTION_COEF_MOUSE = 0.005f;
 	
-	private static final float GRAVITY_CONST_WEBCAM = 0.04f;  
+	private static final float GRAVITY_CONST_WEBCAM = 0.08f;  
 	private static final float FRICTION_COEF_WEBCAM = 0.001f;
 	
 	private static final float LIMIT_ANGLE = 60.0f; //angle in degree
@@ -52,6 +53,7 @@ public class PlateController extends Controller implements AnimatedTextListener{
 	private static final float SPEED_MAX = 1.5f;
 	private static final float SPEED_STEP = 0.05f;
 	private static final int NUMBER_OF_OBSTACLES_EAT_MODE = 5;
+	private static final float TOP_VIEW_SCALE = 0.2f;
 	private static final String BURGER_OBJ_FILE_PATH = "burger.obj";
 	private static final String FRIES_OBJ_FILE_PATH = "fries.obj";
 	private static final String DRINK_OBJ_FILE_PATH = "drink.obj";
@@ -79,7 +81,8 @@ public class PlateController extends Controller implements AnimatedTextListener{
 	private boolean isInputEnabled;
 	private PImage logoImage;
 	private Date date = new Date();
-	
+	private PGraphics topView;
+	private boolean fiveHitDone;
 	
 	private long lastTimeScored;
 	
@@ -90,7 +93,7 @@ public class PlateController extends Controller implements AnimatedTextListener{
 		this.futureAnimatedTextList = new ArrayList<AnimatedTextPlate>();
 		this.obstaclesToRemoveList = new ArrayList<PlateObstacleObject>();
 		this.gameMode = GameMode.CLASSIC;
-		webcam = new Webcam(parent);
+		webcam = new Webcam(parent, this);
 		logoImage = p.loadImage(LOGO_SMALL_FILE);
 		
 	}
@@ -122,10 +125,12 @@ public class PlateController extends Controller implements AnimatedTextListener{
 		this.gameStart = false;
 		this.gameIsFinished = false;
 		this.isInputEnabled = true;
+		this.fiveHitDone = false;
 		this.animatedTextList.removeAll(animatedTextList);
 		this.futureAnimatedTextList.removeAll(futureAnimatedTextList);
-
-		removeAllPlateObstacles();
+		this.topView = p.createGraphics(PApplet.round(plate.width * TOP_VIEW_SCALE), PApplet.round(plate.depth * TOP_VIEW_SCALE), PApplet.P2D);
+		
+		removeAllPlateObstacles();	
 
 		// Start 3-2-1-GO coutdown 
 		if (START_COUNTER) {
@@ -204,20 +209,29 @@ public class PlateController extends Controller implements AnimatedTextListener{
 			setOrigin(-p.width/2.0f,- p.height/2.0f, 0);
 			displayEatenObstaclesCounter();
 			displayScore();
-			displayCountup();
+			//displayCountup();
+			setOrigin(p.width/2.0f, p.height/2.0f, 0);
+		}
+		
+		if (!fiveHitDone && !gameIsFinished && isAllFiveObstaclesEaten()) {
+			//displayMessagePanel("5 HITS!");
+			fiveHitDone = true;
+			PointsText fiveHit = new PointsText(p, this, "5 HITS!", 0, -200, 0, 100, p.color(255,0,0),1.5f);
+			futureAnimatedTextList.add(fiveHit);
 			
 		}
 		
 		if (gameIsFinished) {
-			setOrigin(p.width/2.0f, p.height/2.0f, 0);
-			displayEndPanel();
+			displayMessagePanel("ROUND FINISHED!");
 			plate.angleX = -30;
 			plate.angleZ = 0;
 		}
 		
 		if (MainController.webcamEnabled) {
-			setOrigin(-p.width/2.0f, -p.height/2.0f, 0);
-			webcam.draw();
+			int posy = (plate.angleX > 0.0) ? 270 : -390;
+			int x = -160;
+			webcam.draw(x, posy);
+			drawMap(x + webcam.drawWidth + 5  , posy);
 		}
 		
 	
@@ -297,6 +311,7 @@ public class PlateController extends Controller implements AnimatedTextListener{
 
 	@Override
 	public void animatedTextHasFinishedHalfWay(AnimatedTextPlate animatedTextPlate) {
+	
 		if (animatedTextPlate == startCountDown3) {
 			startCountDown2 = new StartCountdown(p, this, "2", 0, 0, 1000);
 			futureAnimatedTextList.add(startCountDown2);
@@ -319,38 +334,72 @@ public class PlateController extends Controller implements AnimatedTextListener{
 		return PApplet.round(p.mouseY - p.height/2.0f);
 	}
 
-
+	
+	
 	private boolean isGameFinished() {
-		if (gameMode == GameMode.CLASSIC) {
+		return countdown <= 0;
+		/*if (gameMode == GameMode.CLASSIC) {
 			return countdown <= 0;
 		} else if (gameMode == GameMode.EAT_ALL) {
 			return numberOfHit == NUMBER_OF_OBSTACLES_EAT_MODE;
 		}
-		return true;
+		return true;*/
+	}
+	
+	private boolean isAllFiveObstaclesEaten() {
+		return numberOfHit >= NUMBER_OF_OBSTACLES_EAT_MODE;
 	}
 		
 	private void displayCountdown() {
 		if (gameStart) {
-			if (p.millis() - lastTimeDown >= 1000) {
+			if (!gameIsFinished && p.millis() - lastTimeDown >= 1000) {
 				countdown = countdown - 1;
 				lastTimeDown = p.millis();
 			}
-
-			int fontColor = (countdown <= 10) ? p.color(1,0,0) : p.color(0,0,0);
-
-			p.textSize(80);
-			p.textAlign(PApplet.CENTER);
-			p.fill(fontColor);
-			p.text(""+countdown, -100, 50);
+			
+			int y = 70 ;//p.height - 25;
+			
+			if ( PApplet.floor(countdown / 60) > 0) {
+				int fontSize = 80; // 30
+				p.textSize(fontSize);
+				p.textAlign(PApplet.LEFT);
+				p.fill(p.color(0,0,0));
+				p.text(countdown / 60 , 0, y);
+				p.textSize(fontSize-10);
+				p.fill(p.color(255,0,0));
+				p.text(" m", 35, y);
+				p.textSize(fontSize);
+				p.fill(p.color(0,0,0));
+				int sec = countdown % 60;
+				String secString = (String) ((sec < 10) ? "0"+sec : ""+sec);
+				p.text(secString, 110, y);
+				p.textSize(fontSize-10);
+				p.fill(p.color(255,0,0));
+				p.text(" sec", 160, y);
+			} else {
+				p.textAlign(PApplet.LEFT);
+				int fontSize = 80; // 30
+				p.textSize(fontSize);
+				p.fill(p.color(0,0,0));
+				int sec = countdown % 60;
+				String secString = (String) ((sec < 10) ? "0"+sec : ""+sec);
+				p.text(secString, 5, y);
+				p.textSize(fontSize-10);
+				p.fill(p.color(255,0,0));
+				p.text(" sec", 70, y);
+			}
+			
+			
 		}
 	}
 	
 	private void displayEatenObstaclesCounter() {
 		if (gameStart) {
+			float y = p.height -25;
 			p.textSize(100);
 			p.textAlign(PApplet.LEFT);
 			p.fill(p.color(255,0,0));
-			p.text(numberOfHit + "/" + NUMBER_OF_OBSTACLES_EAT_MODE ,0, 100);
+			p.text(numberOfHit + "/" + NUMBER_OF_OBSTACLES_EAT_MODE ,0, y);
 		}
 	}
 	
@@ -359,16 +408,16 @@ public class PlateController extends Controller implements AnimatedTextListener{
 			p.textSize(100);
 			p.textAlign(PApplet.RIGHT);
 			p.fill(0,255,0);
-			p.text(totalScore, p.width - 200, 100);
+			p.text(totalScore, p.width - 200, 80);
 			p.fill(0,0,0);
 			p.textSize(50);
-			p.text("kcal", p.width - 100, 100);
+			p.text("kcal", p.width - 100, 80);
 		}
 	}
 	
 	private void displayCountup() {
 		if (gameStart) {
-			if (p.millis() - lastTimeUp >= 1000) {
+			if (!gameIsFinished && p.millis() - lastTimeUp >= 1000) {
 				countup = countup + 1;
 				lastTimeUp = p.millis();
 			}
@@ -390,21 +439,25 @@ public class PlateController extends Controller implements AnimatedTextListener{
 		}
 	}
 	
-	private void displayEndPanel() {
-		/*p.fill(255,225,0);
-		p.stroke(255,0,0);
-		p.strokeWeight(10);
-		float panelWidth = 800;
-		float panelHeight = 500;
-		p.rect(p.width/2 - panelWidth/2, p.height / 2 - panelHeight/2 , panelWidth, panelHeight, 7);
-		p.textSize(120);
-		p.textAlign(PApplet.CENTER);
-		p.fill(255,0,0);
-		p.text("ROUND FINISHED!" , p.width/2, 100);*/
+	/*private void displayEndPanel() {
 		p.textSize(90);
 		p.textAlign(PApplet.CENTER);
 		p.fill(255,0,0);
 		p.text("ROUND FINISHED!" , 0, -200);
+	}
+	
+	private void displayFiveHitPanel() {
+		p.textSize(90);
+		p.textAlign(PApplet.CENTER);
+		p.fill(255,0,0);
+		p.text("5 HITS!!" , 0, -200);
+	}*/
+	
+	private void displayMessagePanel(String message) {
+		p.textSize(90);
+		p.textAlign(PApplet.CENTER);
+		p.fill(255,0,0);
+		p.text(message , 0, -200);
 	}
 	
 
@@ -499,45 +552,28 @@ public class PlateController extends Controller implements AnimatedTextListener{
 			}
 		}
 		
-		MainController.consoleLayer.write("[MOUSE] angle Y = " + plate.angleY);
+		MainController.consoleLayer.write("[MOUSE] angle X = " + plate.angleX);
 		MainController.consoleLayer.write("[MOUSE] angles Z = " + plate.angleZ);
 
 	}
 
-	/*private void webcamInput() {
-		// webcam 
-		
-		//long start = System.currentTimeMillis();
-		webcam.update();
-		//long estimatedTime = System.currentTimeMillis() - start;
-		//if (estimatedTime > 200) System.err.println("webcam update [MS] = " + estimatedTime);
-		
-		
-		PVector angles = webcam.getAngles();
-		
-		plate.angleX = angles.x;
-		plate.angleZ = angles.z;
 
-		MainController.consoleLayer.write("[WEBCAM] angle Z = " + plate.angleZ);
-		MainController.consoleLayer.write("[WEBCAM] angles X = " + plate.angleX);
-		MainController.consoleLayer.write("[WEBCAM] angles = " + angles);
-		MainController.consoleLayer.write("-----------------------------");
-	}*/
 	
 	
 	private void webcamInput() {
 		// webcam 
 		webcam.update();
-		PVector angles = webcam.getAngles();
-		
-		int deltaAngle = 5;
-		
-		if (angles.x <= LIMIT_ANGLE && angles.x >= -LIMIT_ANGLE && Math.abs(plate.angleX-angles.x) > deltaAngle) {
-			plate.angleX = angles.x;
+
+		if ((plate.angleX + webcam.getIncrementX()) <= LIMIT_ANGLE && (plate.angleX + webcam.getIncrementX()) >= -LIMIT_ANGLE) {
+			plate.angleX += webcam.getIncrementX();
 		} 
-		if (angles.y <= LIMIT_ANGLE && angles.y >= -LIMIT_ANGLE && Math.abs(plate.angleZ-angles.y) > deltaAngle) {
-			plate.angleZ = angles.y;
+		
+		if ((plate.angleZ + webcam.getIncrementZ()) <= LIMIT_ANGLE && (plate.angleZ + webcam.getIncrementZ()) >= -LIMIT_ANGLE) {
+			plate.angleZ += webcam.getIncrementZ();
 		}
+
+		System.err.println("plate.angleX: " + plate.angleX);
+		System.err.println("plate.angleZ: " + plate.angleZ);
 
 	}
 
@@ -549,6 +585,26 @@ public class PlateController extends Controller implements AnimatedTextListener{
 		}
 	}
 	
+	private void drawMap(int posx, int posy) {
+	
+		topView.beginDraw();
+		topView.scale(TOP_VIEW_SCALE);
 
+		//Draw the plate in 2d
+		plate.draw2D(topView);
+		topView.translate(PApplet.round(plate.width/2.0f), PApplet.round(plate.depth/2.0f)); //set the center of the 2D plate at origin
+
+		//Draw the ball in 2d
+		ball.draw2D(topView);
+
+		//Draw the obstacles in 2d
+		for (PlateObstacleObject obstacle : obstacleList) {
+			obstacle.draw2D(topView);
+		}
+		topView.endDraw();
+		
+		p.image(topView, posx, posy);
+		
+	}
 
 }

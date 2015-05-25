@@ -62,7 +62,7 @@ public class ModeController extends Controller implements ButtonListener {
 	private void loadDefaultPlateObstacles() {
 		
 		PlateController plateController = (PlateController) MainController.getCurrentControler();
-		ArrayList<PlateObstacleObject> plateObstacleObjects = new ArrayList<>();
+		ArrayList<PlateObstacleObject> plateObstacleObjects = new ArrayList<PlateObstacleObject>();
 		
 		// Create a burger
 		PlateObstacleObject burger = plateController.constructPlateObstacleObject(PlateObstacleType.BURGER); 

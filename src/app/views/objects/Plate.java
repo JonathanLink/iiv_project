@@ -56,7 +56,7 @@ public class Plate extends RenderObject {
 		
 		
 		if (LOAD_3D_PLATE) {
-			if (angleX > 0.0) {
+			if (angleX >= -11.5) {
 				//transparent tilted plate to see the ball
 				//p.stroke(140.0f, 140.0f, 140.0f);
 				p.shape(wireframeTray);

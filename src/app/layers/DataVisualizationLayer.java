@@ -121,9 +121,9 @@ public class DataVisualizationLayer extends Layer{
 		//Text of the scoreboard
 		scoreBoard.fill(0);  
 		scoreBoard.textSize(12);
-		scoreBoard.text("� Total Score", 15, 20);
-		scoreBoard.text("� Velocity", 15, 80);
-		scoreBoard.text("� Last Score", 15, 120);
+		scoreBoard.text("Total Score", 15, 20);
+		scoreBoard.text("Velocity", 15, 80);
+		scoreBoard.text("Last Score", 15, 120);
 		//TODO what does last score represent?
 		//scoreBoard.text("-- pts", 15, 135);
 

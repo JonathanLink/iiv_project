@@ -6,7 +6,7 @@ import processing.core.*;
 
 public class ImageProcessingSolver extends Parent {
 
-	public static float scale = 0.7f;
+	public static float scale = 0.5f;
 
 	//gaussian filter
 	private static final float[][] gaussian = { 
